@@ -24,9 +24,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "board.h"
 
-const int LIVE = 1;
-const int DEAD = 0;
-const unsigned long long NANO = 1000000000;
+const int LIVE = 1; // represents a living cell on the board.
+const int DEAD = 0; // represents a dead cell on the board.
+const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
 
 void generate(board_t* next_board, board_t* board);
 void display(board_t* board);
@@ -54,6 +54,8 @@ int main(int argc, char* argv[])
         generate(&next_board, &board);
 
         // wait for <sleep_time> adjusted by time of last loop
+        // FIXME: Find a way to make this cross-platform. This implementation
+        // is POSIX only.
         clock_gettime(CLOCK_REALTIME, &tm);
         now = tm.tv_nsec + tm.tv_sec * NANO;
         if (last_time > 0) {
@@ -70,7 +72,7 @@ int main(int argc, char* argv[])
 /*
  * Displays the current board in stdout
  *
- * Parameters: board_t board
+ * Parameters: board_t* board
  * Return: void
  */
 void display(board_t* board)
@@ -80,6 +82,7 @@ void display(board_t* board)
 
     for(y = 0; y < board->height; y++) {
         for(x = 0; x < board->width; x++) {
+            // display 0 for each living cell, space for each dead cell
             value = board_get_cell(board, x, y);
             if (value == LIVE) {
                 printf("O");
