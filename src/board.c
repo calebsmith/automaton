@@ -3,38 +3,50 @@
 
 #include "board.h"
 
+#define EXIT_STATUS_NO_FILE 1
+#define EXIT_STATUS_BAD_FILE 2
+
+
 void board_init(board_t* board, const char* filename)
 {
     int i = 0;
     int current_cell;
+    int size;
     FILE *infile;
 
     if ((infile = fopen(filename, "r")) == NULL) {
         printf("Could not open file %s\n", filename);
-        exit(1);
+        exit(EXIT_STATUS_NO_FILE);
     } else {
         if((fscanf(infile, "%d", &board->toroidal)) != 1) {
             printf("Bad file format\n");
-            exit(1);
+            exit(EXIT_STATUS_BAD_FILE);
         }
         if((fscanf(infile, "%lld", &board->sleep_time)) != 1) {
             printf("Bad file format\n");
-            exit(1);
+            exit(EXIT_STATUS_BAD_FILE);
         }
         if((fscanf(infile, "%d", &board->width)) != 1) {
             printf("Bad file format\n");
-            exit(1);
+            exit(EXIT_STATUS_BAD_FILE);
         }
         if((fscanf(infile, "%d", &board->height)) != 1) {
             printf("Bad file format\n");
-            exit(1);
+            exit(EXIT_STATUS_BAD_FILE);
         }
-        board->size = board->width * board->height;
-        board->cells = (int *) malloc(board->size * sizeof(int));
+        if ((board->width > 1024 || board->width < 5) ||
+            (board->height > 768 || board->height < 5)) {
+            printf("Invalid width/height data.\n"
+                "Must be 5 < x < 1024 and 5 < y < 768\n"
+            );
+            exit(EXIT_STATUS_BAD_FILE);
+        }
+        size = board->width * board->height;
+        board->cells = (int *) malloc(size * sizeof(int));
         while((current_cell = fgetc(infile)) != EOF) {
-            if (i > board->size) {
+            if (i > size) {
                 printf("File contains too many values\n");
-                exit(2);
+                exit(EXIT_STATUS_BAD_FILE);
             }
             current_cell -= '0';
             if (current_cell == 0 || current_cell == 1) {
@@ -48,14 +60,15 @@ void board_init(board_t* board, const char* filename)
 void board_copy(board_t* board_a, const board_t* board_b)
 {
     int i;
+    int size;
 
     board_a->toroidal = board_b->toroidal;
     board_a->sleep_time = board_b->sleep_time;
     board_a->width = board_b->width;
     board_a->height = board_b->height;
-    board_a->size = board_b->size;
-    board_a->cells = (int *) malloc(board_a->size * sizeof(int));
-    for(i = 0; i< board_b->size; i++) {
+    size = board_a->width * board_a->height;
+    board_a->cells = (int *) malloc(size * sizeof(int));
+    for(i = 0; i < size; i++) {
         board_a->cells[i] = board_b->cells[i];
     }
 }

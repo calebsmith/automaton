@@ -20,19 +20,29 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "board.h"
+
+const int LIVE = 1;
+const int DEAD = 0;
+const unsigned long long NANO = 1000000000;
 
 void generate(board_t* next_board, board_t* board);
 void display(board_t* board);
 
 int main(int argc, char* argv[])
 {
+    const char* filename;
+    unsigned long long now;
+    unsigned long long last_time = 0;
+    struct timespec tm;
+
     if (argc < 2) {
         printf("Must provide a filename to a data file\n");
         exit(1);
     }
-    const char* filename = argv[1];
+    filename = argv[1];
     // Create a game board, and a next board
     board_t board, next_board;
     board_init(&board, filename);
@@ -42,13 +52,27 @@ int main(int argc, char* argv[])
     while(1) {
         display(&board);
         generate(&next_board, &board);
-        usleep(board.sleep_time);
+
+        // wait for <sleep_time> adjusted by time of last loop
+        clock_gettime(CLOCK_REALTIME, &tm);
+        now = tm.tv_nsec + tm.tv_sec * NANO;
+        if (last_time > 0) {
+            usleep(last_time / 1000.0f + board.sleep_time - now / 1000.0f);
+        }
+        clock_gettime(CLOCK_REALTIME, &tm);
+        last_time = tm.tv_nsec + tm.tv_sec * NANO;
     }
     board_destroy(&board);
     board_destroy(&next_board);
     return 0;
 }
 
+/*
+ * Displays the current board in stdout
+ *
+ * Parameters: board_t board
+ * Return: void
+ */
 void display(board_t* board)
 {
     int x, y;
@@ -57,7 +81,7 @@ void display(board_t* board)
     for(y = 0; y < board->height; y++) {
         for(x = 0; x < board->width; x++) {
             value = board_get_cell(board, x, y);
-            if (value) {
+            if (value == LIVE) {
                 printf("O");
             } else {
                 printf(" ");
@@ -67,7 +91,15 @@ void display(board_t* board)
     }
 }
 
-
+/*
+ * Determines the next board based on the cells of the current one, then
+ * swaps them to move to the next generation
+ *
+ * Parameters: board_t* next_board, board_t* board
+ * Return: void
+ * Side-Effect: Overwrite next_board with data for the next generation and
+ *     swap the boards
+ */
 void generate(board_t* next_board, board_t* board)
 {
     int x, y;
@@ -77,6 +109,7 @@ void generate(board_t* next_board, board_t* board)
     int x_lower_bound, x_higher_bound;
     int y_lower_bound, y_higher_bound;
 
+    // Determine boundaries of the board based on its toroidal flag
     if (board->toroidal) {
         x_lower_bound = 0;
         y_lower_bound = 0;
@@ -88,6 +121,8 @@ void generate(board_t* next_board, board_t* board)
         x_higher_bound = board->width - 1;
         y_higher_bound = board->height - 1;
     }
+    // Visit each cell, count its neighbors and determine its living/dead
+    // status in the next generation. Then apply to the next_board
     for(y = y_lower_bound; y < y_higher_bound; y++) {
         for(x = x_lower_bound; x < x_higher_bound; x++) {
             num_neighbors = board_count_neighbors(board, x, y);
@@ -96,18 +131,18 @@ void generate(board_t* next_board, board_t* board)
             if (current_cell) {
                 if (num_neighbors < 2) {
                     // underpopulation
-                    next_board->cells[index] = 0;
+                    next_board->cells[index] = DEAD;
                 } else if (num_neighbors == 2 || num_neighbors == 3) {
                     // healthy living
-                    next_board->cells[index] = 1;
+                    next_board->cells[index] = LIVE;
                 } else if (num_neighbors > 3) {
                     // overcrowding
-                    next_board->cells[index] = 0;
+                    next_board->cells[index] = DEAD;
                 }
             } else {
                 if (num_neighbors == 3) {
                     // reproduction
-                    next_board->cells[index] = 1;
+                    next_board->cells[index] = LIVE;
                 } else {
                     // stasis
                     next_board->cells[index] = current_cell;
@@ -115,5 +150,6 @@ void generate(board_t* next_board, board_t* board)
             }
         }
     }
+    // swap boards
     board_swap(board, next_board);
 }
