@@ -7,6 +7,17 @@
 #define EXIT_STATUS_BAD_FILE 2
 
 
+/*
+ * Given a board_t pointer and a filename, loads seed data from the file and
+ * initializes the board struct with that data. To use a board, this or
+ * board_copy must be called before use. board_destroy should be called on
+ * the board when it is no longer in use.
+ *
+ * Parameters: board_t* board, const char* filename
+ * Side-effects: Opens the <filename> file, and if successful initializes the
+ *     board with data. Exits the program if the file cannot be found or is not
+ *     a proper format
+ */
 void board_init(board_t* board, const char* filename)
 {
     int i = 0;
@@ -57,6 +68,19 @@ void board_init(board_t* board, const char* filename)
     fclose(infile);
 }
 
+/*
+ * Given two board_t pointers, copy the data in the second into that of the
+ * first. This or board_init must be called on a board before it can be used.
+ * board_destroy should be called on the board when it is no longer used.
+ * The purpose of board_copy is to initialize a board with values from another
+ * board, rather than loading seed data from a file. This is necessary for
+ * creating a second board as a sort of "buffer" for the next generation of
+ * data.
+ *
+ * Parameters: board_t* board_a, const board_t* board_b
+ * Side-Effects: Initialize board_a with data from board_b. Allocates memory
+ *     for board_a as needed.
+ */
 void board_copy(board_t* board_a, const board_t* board_b)
 {
     int i;
@@ -74,6 +98,12 @@ void board_copy(board_t* board_a, const board_t* board_b)
 }
 
 
+/*
+ * Given two board_t pointers, swaps the cell data inside of each.
+ *
+ * Parameters: board_t* board_a, board_t* board_b
+ * Side-Effects: swaps the .cells attribute of each board.
+ */
 void board_swap(board_t* board_a, board_t* board_b)
 {
     int* swap_cells;
@@ -82,7 +112,16 @@ void board_swap(board_t* board_a, board_t* board_b)
     board_b->cells = swap_cells;
 }
 
-
+/*
+ * Given a board_t* and x,y coordinates, returns the value of the cell at that
+ * location. If the x,y is out of bounds for the board, a toroidal
+ * interpretation of the coordinates is assumed (wraps around to the other side
+ * of the board).
+ *
+ * Parameters: const board_t* board, int x, int y
+ * Side-Effects: None
+ * Returns: int value of the cell (0 or 1)
+ */
 int board_get_cell(const board_t* board, int x, int y)
 {
     int index;
@@ -102,6 +141,14 @@ int board_get_cell(const board_t* board, int x, int y)
     return board->cells[index];
 }
 
+/*
+ * Given a board_t pointer and x,y coordinates, returns the number
+ * of living neighbors for the cell at x,y.
+ *
+ * Parameters: const board_t* board, int x, int y
+ * Side-Effects: None
+ * Returns: int of the total number of neighbors
+ */
 int board_count_neighbors(const board_t* board, int x, int y)
 {
     return (
@@ -116,6 +163,12 @@ int board_count_neighbors(const board_t* board, int x, int y)
     );
 }
 
+/*
+ * Given a board_t pointer, free the memory allocated for that board.
+ *
+ * Parameters: board_t* board
+ * Side-Effects: frees memory for the given board.
+ */
 void board_destroy(board_t* board)
 {
     free(board->cells);
