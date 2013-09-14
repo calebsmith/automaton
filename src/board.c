@@ -45,7 +45,7 @@ void board_init(board_t* board, const char* filename)
     fclose(infile);
 }
 
-void board_copy(board_t* board_a, board_t* board_b)
+void board_copy(board_t* board_a, const board_t* board_b)
 {
     int i;
 
@@ -70,7 +70,7 @@ void board_swap(board_t* board_a, board_t* board_b)
 }
 
 
-int board_get_cell(board_t* board, int x, int y)
+int board_get_cell(const board_t* board, int x, int y)
 {
     int index;
     if (x >= board->width) {
@@ -89,7 +89,7 @@ int board_get_cell(board_t* board, int x, int y)
     return board->cells[index];
 }
 
-int board_count_neighbors(board_t* board, int x, int y)
+int board_count_neighbors(const board_t* board, int x, int y)
 {
     return (
         board_get_cell(board, x - 1, y - 1) +
