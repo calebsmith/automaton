@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -std=c99 -D _BSD_SOURCE
-NAME = ../life
+NAME = ../gameoflife
 SOURCES = *.c
 
 $(NAME): $(SOURCES)

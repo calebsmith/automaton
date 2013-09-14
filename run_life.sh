@@ -1,1 +1,1 @@
-./life data/gosper_gun.dat
+./gameoflife data/gosper_gun.dat
