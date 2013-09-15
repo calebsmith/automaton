@@ -19,8 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <time.h>
+#include <curses.h>
 
 #include "board.h"
 
@@ -29,14 +29,16 @@ const int DEAD = 0; // represents a dead cell on the board.
 const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
 
 void generate(board_t* next_board, board_t* board);
-void display(board_t* board);
+WINDOW* init_curses(void);
+void display(board_t* board, WINDOW* window);
 
 int main(int argc, char* argv[])
 {
-    const char* filename;
+    // variables for real-time clock
     unsigned long long now;
     unsigned long long last_time = 0;
     struct timespec tm, sleep_tm;
+    WINDOW* window;
 
     sleep_tm.tv_sec = 0;
 
@@ -44,15 +46,15 @@ int main(int argc, char* argv[])
         printf("Must provide a filename to a data file\n");
         exit(1);
     }
-    filename = argv[1];
     // Create a game board, and a next board
     board_t board, next_board;
-    board_init(&board, filename);
+    board_init(&board, argv[1]);
     board_copy(&next_board, &board);
 
+    window = init_curses();
     // Display game board, find next generation and loop
     while(1) {
-        display(&board);
+        display(&board, window);
         generate(&next_board, &board);
 
         // wait for <sleep_time> adjusted by time of last loop
@@ -67,6 +69,7 @@ int main(int argc, char* argv[])
         clock_gettime(CLOCK_REALTIME, &tm);
         last_time = tm.tv_nsec + tm.tv_sec * NANO;
     }
+    endwin();
     board_destroy(&board);
     board_destroy(&next_board);
     return 0;
@@ -75,26 +78,33 @@ int main(int argc, char* argv[])
 /*
  * Displays the current board in stdout
  *
- * Parameters: board_t* board
+ * Parameters: board_t* board, WINDOW* display_area
  * Return: void
  */
-void display(board_t* board)
+void display(board_t* board, WINDOW* window)
 {
     int x, y;
+    int display_width, display_height;
     int value;
 
     for(y = 0; y < board->height; y++) {
         for(x = 0; x < board->width; x++) {
             // display 0 for each living cell, space for each dead cell
             value = board_get_cell(board, x, y);
-            if (value == LIVE) {
-                printf("O");
-            } else {
-                printf(" ");
+            move(y, x);
+            delch();
+            // determine terminal's rows and columns. Display cell if in bounds
+            getmaxyx(window, display_height, display_width);
+            if (y < display_height && x < display_width) {
+                if (value == LIVE) {
+                    insch('0');
+                } else {
+                    insch(' ');
+                }
             }
         }
-        printf("\n");
     }
+    refresh();
 }
 
 /*
@@ -158,4 +168,20 @@ void generate(board_t* next_board, board_t* board)
     }
     // swap boards
     board_swap(board, next_board);
+}
+
+/*
+ * Initializes and clears a curses window with raw input mode, and no echo.
+ *
+ * Parameters: void
+ * Returns: WINDOW* referring to the curses window
+ */
+WINDOW* init_curses(void)
+{
+    // create and prepare a curses window
+    WINDOW* window = initscr();
+    cbreak();
+    noecho();
+    clear();
+    return window;
 }
