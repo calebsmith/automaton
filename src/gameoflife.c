@@ -24,6 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "board.h"
 
+const int LIVE = 1;
+const int DEAD = 0;
 const unsigned long long NANO = 1000000000;
 
 void generate(board_t* next_board, board_t* board);
@@ -79,7 +81,7 @@ void display(board_t* board)
     for(y = 0; y < board->height; y++) {
         for(x = 0; x < board->width; x++) {
             value = board_get_cell(board, x, y);
-            if (value) {
+            if (value == LIVE) {
                 printf("O");
             } else {
                 printf(" ");
@@ -129,18 +131,18 @@ void generate(board_t* next_board, board_t* board)
             if (current_cell) {
                 if (num_neighbors < 2) {
                     // underpopulation
-                    next_board->cells[index] = 0;
+                    next_board->cells[index] = DEAD;
                 } else if (num_neighbors == 2 || num_neighbors == 3) {
                     // healthy living
-                    next_board->cells[index] = 1;
+                    next_board->cells[index] = LIVE;
                 } else if (num_neighbors > 3) {
                     // overcrowding
-                    next_board->cells[index] = 0;
+                    next_board->cells[index] = DEAD;
                 }
             } else {
                 if (num_neighbors == 3) {
                     // reproduction
-                    next_board->cells[index] = 1;
+                    next_board->cells[index] = LIVE;
                 } else {
                     // stasis
                     next_board->cells[index] = current_cell;
