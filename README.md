@@ -40,18 +40,19 @@ The data file is of the following format::
         <width> and there should be as many lines as <height>
 
 The following is an example data file::
-0
-55000
-8
-8
-00000000
-01110100
-01000000
-00001100
-00110100
-01010100
-00000000
-00000000
+
+    0
+    55000
+    8
+    8
+    00000000
+    01110100
+    01000000
+    00001100
+    00110100
+    01010100
+    00000000
+    00000000
 
 See data/gosper_gun.dat for a more practical example
 
