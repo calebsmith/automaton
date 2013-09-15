@@ -4,7 +4,7 @@
 typedef struct {
     int toroidal;
     long long int sleep_time;
-    int width, height, size;
+    int width, height;
     int *cells;
 } board_t;
 
