@@ -36,7 +36,9 @@ int main(int argc, char* argv[])
     const char* filename;
     unsigned long long now;
     unsigned long long last_time = 0;
-    struct timespec tm;
+    struct timespec tm, sleep_tm;
+
+    sleep_tm.tv_sec = 0;
 
     if (argc < 2) {
         printf("Must provide a filename to a data file\n");
@@ -58,8 +60,9 @@ int main(int argc, char* argv[])
         // is POSIX only.
         clock_gettime(CLOCK_REALTIME, &tm);
         now = tm.tv_nsec + tm.tv_sec * NANO;
+        sleep_tm.tv_nsec = last_time + board.sleep_time * 1000 - now;
         if (last_time > 0) {
-            usleep(last_time / 1000.0f + board.sleep_time - now / 1000.0f);
+            nanosleep(&sleep_tm, NULL);
         }
         clock_gettime(CLOCK_REALTIME, &tm);
         last_time = tm.tv_nsec + tm.tv_sec * NANO;
