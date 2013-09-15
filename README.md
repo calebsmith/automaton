@@ -27,8 +27,9 @@ Usage
 -----
 
 The program requires one argument, which is the data file for loading the
-initial state. Such a file is provided in data/gosper_gun.dat. The run_life.sh
-shell command demonstrates running gameoflife with this data file.
+initial state (e.g. seed). Such files are provided with the repository in
+the /data folder. The run_life.sh shell command demonstrates running
+gameoflife with the gosper_gun data file.
 
 The data file is of the following format::
 
