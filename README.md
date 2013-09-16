@@ -13,7 +13,7 @@ This was developed and tested on GNU/Linux. The curses and time libraries rely
 on POSIX standards and will likely compile and run on Mac OSX, but this is not
 yet tested.
 
-Windows support is non-existant at the moment. If this is desired, please
+Windows support is non-existent at the moment. If this is desired, please
 contribute by making a pull request or opening an issue with links to good
 documentation.
 
