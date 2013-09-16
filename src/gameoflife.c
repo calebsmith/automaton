@@ -28,19 +28,20 @@ const int LIVE = 1; // represents a living cell on the board.
 const int DEAD = 0; // represents a dead cell on the board.
 const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
 
-void generate(board_t* next_board, board_t* board);
 WINDOW* init_curses(void);
-void display(board_t* board, WINDOW* window);
+void display(const board_t* board, WINDOW* window);
+void generate(board_t* next_board, board_t* board);
+void wait(const board_t* board, unsigned long long int* last_time);
+
 
 int main(int argc, char* argv[])
 {
-    // variables for real-time clock
-    unsigned long long now;
-    unsigned long long last_time = 0;
-    struct timespec tm, sleep_tm;
-    WINDOW* window;
-
-    sleep_tm.tv_sec = 0;
+    WINDOW* window; // the curses window
+    // Initialize the `last_time` variable for the real-time clock. Tracks the
+    // time the last loop began for calculating time to wait.
+    unsigned long long* last_time;
+    unsigned long long last_time_default = 0;
+    last_time = &last_time_default;
 
     if (argc < 2) {
         printf("Must provide a filename to a data file\n");
@@ -52,22 +53,11 @@ int main(int argc, char* argv[])
     board_copy(&next_board, &board);
 
     window = init_curses();
-    // Display game board, find next generation and loop
+    // Display game board, find next generation, wait for time and loop
     while(1) {
         display(&board, window);
         generate(&next_board, &board);
-
-        // wait for <sleep_time> adjusted by time of last loop
-        // FIXME: Find a way to make this cross-platform. This implementation
-        // is POSIX only.
-        clock_gettime(CLOCK_REALTIME, &tm);
-        now = tm.tv_nsec + tm.tv_sec * NANO;
-        sleep_tm.tv_nsec = last_time + board.sleep_time * 1000 - now;
-        if (last_time > 0) {
-            nanosleep(&sleep_tm, NULL);
-        }
-        clock_gettime(CLOCK_REALTIME, &tm);
-        last_time = tm.tv_nsec + tm.tv_sec * NANO;
+        wait(&board, last_time);
     }
     endwin();
     board_destroy(&board);
@@ -75,13 +65,31 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+
+/*
+ * initializes and clears a curses window with raw input mode, and no echo.
+ *
+ * parameters: void
+ * returns: window* referring to the curses window
+ */
+WINDOW* init_curses(void)
+{
+    // create and prepare a curses window
+    WINDOW* window = initscr();
+    cbreak();
+    noecho();
+    clear();
+    return window;
+}
+
+
 /*
  * Displays the current board in a curses window
  *
  * Parameters: board_t* board, WINDOW* display_area
  * Return: void
  */
-void display(board_t* board, WINDOW* window)
+void display(const board_t* board, WINDOW* window)
 {
     int x, y;
     int display_width, display_height;
@@ -106,6 +114,7 @@ void display(board_t* board, WINDOW* window)
     }
     refresh();
 }
+
 
 /*
  * Determines the next board based on the cells of the current one, then
@@ -170,18 +179,34 @@ void generate(board_t* next_board, board_t* board)
     board_swap(board, next_board);
 }
 
+
 /*
- * Initializes and clears a curses window with raw input mode, and no echo.
+ * Wait for board's <sleep_time> adjusted by the difference of the current time
+ * and the finishing time of the last loop execution.
  *
- * Parameters: void
- * Returns: WINDOW* referring to the curses window
- */
-WINDOW* init_curses(void)
+ * Note: This implementation is POSIX only.
+ *
+ * Parameters: const board_t* board, unsigned long long int* last_time
+ * Side-Effects: Sets *last_time to the number of nanoseconds on the real-time
+ *     clock after the CPU sleep has occured. This is used to calculate the
+ *     amount of time to sleep in the next loop execution.
+*/
+void wait(const board_t* board, unsigned long long int* last_time)
 {
-    // create and prepare a curses window
-    WINDOW* window = initscr();
-    cbreak();
-    noecho();
-    clear();
-    return window;
+    unsigned long long now;
+    struct timespec tm, sleep_tm;
+
+    sleep_tm.tv_sec = 0;
+
+    // obtain current time
+    clock_gettime(CLOCK_REALTIME, &tm);
+    now = tm.tv_nsec + tm.tv_sec * NANO;
+    if (last_time > 0) {
+        // calculate amount of time to wait
+        sleep_tm.tv_nsec = *last_time + board->sleep_time * 1000 - now;
+        nanosleep(&sleep_tm, NULL);
+    }
+    // obtain current time after waiting and store for next call
+    clock_gettime(CLOCK_REALTIME, &tm);
+    *last_time = tm.tv_nsec + tm.tv_sec * NANO;
 }
