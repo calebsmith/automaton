@@ -4,16 +4,39 @@ gameoflife
 A simple implementation of Conway's Game of Life in C
 
 
+Notes
+-----
+
+This project is experimental and exists for my own learning.
+
+This was developed and tested on GNU/Linux. The curses and time libraries rely
+on POSIX standards and will likely compile and run on Mac OSX, but this is not
+yet tested.
+
+Windows support is non-existant at the moment. If this is desired, please
+contribute by making a pull request or opening an issue with links to good
+documentation.
+
+
 Requirements
 ------------
 
  * git 1.7.9
  * gcc 4.6.3
  * make 3.8.1
+ * curses 5.9
+
+For Debian GNU/Linux these are provided in the following packages:
+
+ * git
+ * gcc
+ * make
+ * libncurses5-dev
 
 
 Installation
 ------------
+First, assure all requirements are met.
 To run, clone the repo, run make in the src folder, then run 'run_life.sh'::
 
     git clone git@github.com:calebsmith/gameoflife.git

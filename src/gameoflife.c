@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 }
 
 /*
- * Displays the current board in stdout
+ * Displays the current board in a curses window
  *
  * Parameters: board_t* board, WINDOW* display_area
  * Return: void
