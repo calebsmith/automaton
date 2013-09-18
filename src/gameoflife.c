@@ -29,9 +29,9 @@ const int DEAD = 0; // represents a dead cell on the board.
 const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
 
 WINDOW* init_curses(void);
-void display(const board_t* board, WINDOW* window);
-void generate(board_t* next_board, board_t* board);
-void wait(const board_t* board, unsigned long long int* last_time);
+void display(const Board_t* board, WINDOW* window);
+void generate(Board_t* next_board, Board_t* board);
+void wait(const Board_t* board, unsigned long long int* last_time);
 
 
 int main(int argc, char* argv[])
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
     // Create a game board, and a next board
-    board_t board, next_board;
+    Board_t board, next_board;
     board_init(&board, argv[1]);
     board_copy(&next_board, &board);
 
@@ -86,10 +86,10 @@ WINDOW* init_curses(void)
 /*
  * Displays the current board in a curses window
  *
- * Parameters: board_t* board, WINDOW* display_area
+ * Parameters: Board_t* board, WINDOW* display_area
  * Return: void
  */
-void display(const board_t* board, WINDOW* window)
+void display(const Board_t* board, WINDOW* window)
 {
     int x, y;
     int display_width, display_height;
@@ -120,12 +120,12 @@ void display(const board_t* board, WINDOW* window)
  * Determines the next board based on the cells of the current one, then
  * swaps them to move to the next generation
  *
- * Parameters: board_t* next_board, board_t* board
+ * Parameters: Board_t* next_board, Board_t* board
  * Return: void
  * Side-Effect: Overwrite next_board with data for the next generation and
  *     swap the boards
  */
-void generate(board_t* next_board, board_t* board)
+void generate(Board_t* next_board, Board_t* board)
 {
     int x, y;
     int index;
@@ -186,12 +186,12 @@ void generate(board_t* next_board, board_t* board)
  *
  * Note: This implementation is POSIX only.
  *
- * Parameters: const board_t* board, unsigned long long int* last_time
+ * Parameters: const Board_t* board, unsigned long long int* last_time
  * Side-Effects: Sets *last_time to the number of nanoseconds on the real-time
  *     clock after the CPU sleep has occured. This is used to calculate the
  *     amount of time to sleep in the next loop execution.
 */
-void wait(const board_t* board, unsigned long long int* last_time)
+void wait(const Board_t* board, unsigned long long int* last_time)
 {
     unsigned long long now;
     struct timespec tm, sleep_tm;

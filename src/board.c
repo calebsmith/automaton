@@ -8,17 +8,17 @@
 
 
 /*
- * Given a board_t pointer and a filename, loads seed data from the file and
+ * Given a Board_t pointer and a filename, loads seed data from the file and
  * initializes the board struct with that data. To use a board, this or
  * board_copy must be called before use. board_destroy should be called on
  * the board when it is no longer in use.
  *
- * Parameters: board_t* board, const char* filename
+ * Parameters: Board_t* board, const char* filename
  * Side-effects: Opens the <filename> file, and if successful initializes the
  *     board with data. Exits the program if the file cannot be found or is not
  *     a proper format
  */
-void board_init(board_t* board, const char* filename)
+void board_init(Board_t* board, const char* filename)
 {
     int i = 0;
     int current_cell;
@@ -69,7 +69,7 @@ void board_init(board_t* board, const char* filename)
 }
 
 /*
- * Given two board_t pointers, copy the data in the second into that of the
+ * Given two Board_t pointers, copy the data in the second into that of the
  * first. This or board_init must be called on a board before it can be used.
  * board_destroy should be called on the board when it is no longer used.
  * The purpose of board_copy is to initialize a board with values from another
@@ -77,11 +77,11 @@ void board_init(board_t* board, const char* filename)
  * creating a second board as a sort of "buffer" for the next generation of
  * data.
  *
- * Parameters: board_t* board_a, const board_t* board_b
+ * Parameters: Board_t* board_a, const Board_t* board_b
  * Side-Effects: Initialize board_a with data from board_b. Allocates memory
  *     for board_a as needed.
  */
-void board_copy(board_t* board_a, const board_t* board_b)
+void board_copy(Board_t* board_a, const Board_t* board_b)
 {
     int i;
     int size;
@@ -99,12 +99,12 @@ void board_copy(board_t* board_a, const board_t* board_b)
 
 
 /*
- * Given two board_t pointers, swaps the cell data inside of each.
+ * Given two Board_t pointers, swaps the cell data inside of each.
  *
- * Parameters: board_t* board_a, board_t* board_b
+ * Parameters: Board_t* board_a, Board_t* board_b
  * Side-Effects: swaps the .cells attribute of each board.
  */
-void board_swap(board_t* board_a, board_t* board_b)
+void board_swap(Board_t* board_a, Board_t* board_b)
 {
     int* swap_cells;
     swap_cells = board_a->cells;
@@ -113,16 +113,16 @@ void board_swap(board_t* board_a, board_t* board_b)
 }
 
 /*
- * Given a board_t* and x,y coordinates, returns the value of the cell at that
+ * Given a Board_t* and x,y coordinates, returns the value of the cell at that
  * location. If the x,y is out of bounds for the board, a toroidal
  * interpretation of the coordinates is assumed (wraps around to the other side
  * of the board).
  *
- * Parameters: const board_t* board, int x, int y
+ * Parameters: const Board_t* board, int x, int y
  * Side-Effects: None
  * Returns: int value of the cell (0 or 1)
  */
-int board_get_cell(const board_t* board, int x, int y)
+int board_get_cell(const Board_t* board, int x, int y)
 {
     int index;
     if (x >= board->width) {
@@ -142,14 +142,14 @@ int board_get_cell(const board_t* board, int x, int y)
 }
 
 /*
- * Given a board_t pointer and x,y coordinates, returns the number
+ * Given a Board_t pointer and x,y coordinates, returns the number
  * of living neighbors for the cell at x,y.
  *
- * Parameters: const board_t* board, int x, int y
+ * Parameters: const Board_t* board, int x, int y
  * Side-Effects: None
  * Returns: int of the total number of neighbors
  */
-int board_count_neighbors(const board_t* board, int x, int y)
+int board_count_neighbors(const Board_t* board, int x, int y)
 {
     return (
         board_get_cell(board, x - 1, y - 1) +
@@ -164,12 +164,12 @@ int board_count_neighbors(const board_t* board, int x, int y)
 }
 
 /*
- * Given a board_t pointer, free the memory allocated for that board.
+ * Given a Board_t pointer, free the memory allocated for that board.
  *
- * Parameters: board_t* board
+ * Parameters: Board_t* board
  * Side-Effects: frees memory for the given board.
  */
-void board_destroy(board_t* board)
+void board_destroy(Board_t* board)
 {
     free(board->cells);
 }
