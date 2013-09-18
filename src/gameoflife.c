@@ -118,7 +118,8 @@ void display(const Board_t* board, WINDOW* window)
 
 /*
  * Determines the next board based on the cells of the current one, then
- * swaps them to move to the next generation
+ * swaps them to move to the next generation. Follows Conway's Game of Life
+ * rules: B3/S23
  *
  * Parameters: Board_t* next_board, Board_t* board
  * Return: void
@@ -158,7 +159,7 @@ void generate(Board_t* next_board, Board_t* board)
                     // underpopulation
                     next_board->cells[index] = DEAD;
                 } else if (num_neighbors == 2 || num_neighbors == 3) {
-                    // healthy living
+                    // surviving
                     next_board->cells[index] = LIVE;
                 } else if (num_neighbors > 3) {
                     // overcrowding
