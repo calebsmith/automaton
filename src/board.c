@@ -149,7 +149,7 @@ int board_get_cell(const Board_t* board, int x, int y)
  * Side-Effects: None
  * Returns: int of the total number of neighbors
  */
-int board_count_neighbors(const Board_t* board, int x, int y)
+int board_count_moore_neighbors(const Board_t* board, int x, int y)
 {
     return (
         board_get_cell(board, x - 1, y - 1) +

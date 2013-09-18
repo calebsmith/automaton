@@ -150,7 +150,7 @@ void generate(Board_t* next_board, Board_t* board)
     // status in the next generation. Then apply to the next_board
     for(y = y_lower_bound; y < y_higher_bound; y++) {
         for(x = x_lower_bound; x < x_higher_bound; x++) {
-            num_neighbors = board_count_neighbors(board, x, y);
+            num_neighbors = board_count_moore_neighbors(board, x, y);
             index = y * board->width + x;
             current_cell = board_get_cell(board, x, y);
             if (current_cell) {
