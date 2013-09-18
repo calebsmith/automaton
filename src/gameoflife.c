@@ -155,14 +155,11 @@ void generate(Board_t* next_board, Board_t* board)
             index = y * board->width + x;
             current_cell = board_get_cell(board, x, y);
             if (current_cell) {
-                if (num_neighbors < 2) {
-                    // underpopulation
-                    next_board->cells[index] = DEAD;
-                } else if (num_neighbors == 2 || num_neighbors == 3) {
-                    // surviving
+                if (num_neighbors == 2 || num_neighbors == 3) {
+                    // survival
                     next_board->cells[index] = LIVE;
-                } else if (num_neighbors > 3) {
-                    // overcrowding
+                } else {
+                    // overcrowding or underpopulation
                     next_board->cells[index] = DEAD;
                 }
             } else {
@@ -170,8 +167,8 @@ void generate(Board_t* next_board, Board_t* board)
                     // reproduction
                     next_board->cells[index] = LIVE;
                 } else {
-                    // stasis
-                    next_board->cells[index] = current_cell;
+                    // remain dead
+                    next_board->cells[index] = DEAD;
                 }
             }
         }
