@@ -39,9 +39,7 @@ int main(int argc, char* argv[])
     WINDOW* window; // the curses window
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
-    unsigned long long* last_time;
-    unsigned long long last_time_default = 0;
-    last_time = &last_time_default;
+    unsigned long long last_time = 0;
 
     if (argc < 2) {
         printf("Must provide a filename to a data file\n");
@@ -57,7 +55,7 @@ int main(int argc, char* argv[])
     while(1) {
         display(&board, window);
         generate(&next_board, &board);
-        wait(&board, last_time);
+        wait(&board, &last_time);
     }
     endwin();
     board_destroy(&board);
@@ -78,6 +76,7 @@ WINDOW* init_curses(void)
     WINDOW* window = initscr();
     cbreak();
     noecho();
+    curs_set(0);
     clear();
     return window;
 }
@@ -95,19 +94,18 @@ void display(const Board_t* board, WINDOW* window)
     int display_width, display_height;
     int value;
 
+    // clear the display of the old frame
+    clear();
     for(y = 0; y < board->height; y++) {
         for(x = 0; x < board->width; x++) {
             // display 0 for each living cell, space for each dead cell
             value = board_get_cell(board, x, y);
             move(y, x);
-            delch();
             // determine terminal's rows and columns. Display cell if in bounds
             getmaxyx(window, display_height, display_width);
             if (y < display_height && x < display_width) {
                 if (value == LIVE) {
-                    insch('0');
-                } else {
-                    insch(' ');
+                    insch('o');
                 }
             }
         }
