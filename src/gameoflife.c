@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <curses.h>
 
@@ -27,11 +28,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 const int LIVE = 1; // represents a living cell on the board.
 const int DEAD = 0; // represents a dead cell on the board.
 const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
+// Default number of milliseconds to sleep
+const unsigned long long DEFAULT_SLEEP_TIME = 85000;
 
+// Stores command line arguments after parsing
+typedef struct {
+    int toroidal;
+    unsigned long long int sleep_time;
+    const char* filename;
+} Config_t;
+
+Config_t get_config(int argc, char* argv[]);
 WINDOW* init_curses(void);
 void display(const Board_t* board, WINDOW* window);
 void generate(Board_t* next_board, Board_t* board);
-void wait(const Board_t* board, unsigned long long int* last_time);
+void wait(const Config_t* config, unsigned long long int* last_time);
 
 
 int main(int argc, char* argv[])
@@ -41,13 +52,12 @@ int main(int argc, char* argv[])
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
 
-    if (argc < 2) {
-        printf("Must provide a filename to a data file\n");
-        exit(1);
-    }
+    // Parse the command line arguments and store into config
+    Config_t config = get_config(argc, argv);
     // Create a game board, and a next board
     Board_t board, next_board;
-    board_init(&board, argv[1]);
+    board_init(&board, config.filename);
+    board.toroidal = config.toroidal;
     board_copy(&next_board, &board);
 
     window = init_curses();
@@ -55,12 +65,58 @@ int main(int argc, char* argv[])
     while(1) {
         display(&board, window);
         generate(&next_board, &board);
-        wait(&board, &last_time);
+        wait(&config, &last_time);
     }
     endwin();
     board_destroy(&board);
     board_destroy(&next_board);
     return 0;
+}
+
+
+/*
+ * Parses command line arguments and returns them in a Config_t.
+ *
+ * Parameters: int argc, char* argv[]
+ * Returns: Config_t
+ * Side-Effects: Exits with status 1 if filename is not provided
+ */
+Config_t get_config(int argc, char* argv[])
+{
+    Config_t config;
+    int i;
+    char *arg;
+
+    if (argc < 2) {
+        printf("Must provide a filename to a data file\n");
+        exit(1);
+    }
+    config.toroidal = 0;
+    config.sleep_time = DEFAULT_SLEEP_TIME;
+
+    for(i = 0; i < argc; i++) {
+        arg = argv[i];
+        if (i == argc - 1) {
+            // handle filename argument
+            config.filename = arg;
+        } else {
+            // handle toroidal flag
+           if (strcmp(arg, "-t") == 0 || strcmp(arg, "--toroidal") == 0) {
+               config.toroidal = 1;
+           }
+           // handle sleep time argument
+           if (strcmp(arg, "-s") == 0) {
+               config.sleep_time  = atoi(argv[i + 1]);
+           } else if (strncmp(arg, "--sleep=", 8) == 0) {
+               arg = strtok(arg, "="); arg = strtok(NULL, "=");
+               config.sleep_time = atoi(arg);
+           }
+        }
+    }
+    if (config.sleep_time == 0) {
+        config.sleep_time = DEFAULT_SLEEP_TIME;
+    }
+    return config;
 }
 
 
@@ -168,24 +224,27 @@ void generate(Board_t* next_board, Board_t* board)
  *
  * Note: This implementation is POSIX only.
  *
- * Parameters: const Board_t* board, unsigned long long int* last_time
+ * Parameters: const Config_t* config, unsigned long long int* last_time
  * Side-Effects: Sets *last_time to the number of nanoseconds on the real-time
  *     clock after the CPU sleep has occured. This is used to calculate the
  *     amount of time to sleep in the next loop execution.
 */
-void wait(const Board_t* board, unsigned long long int* last_time)
+void wait(const Config_t* config, unsigned long long int* last_time)
 {
-    unsigned long long now;
+    unsigned long long now, delta, config_sleep_time;
     struct timespec tm, sleep_tm;
 
     sleep_tm.tv_sec = 0;
+    config_sleep_time = config->sleep_time * 1000;
 
     // obtain current time
     clock_gettime(CLOCK_REALTIME, &tm);
     now = tm.tv_nsec + tm.tv_sec * NANO;
-    if (last_time > 0) {
-        // calculate amount of time to wait
-        sleep_tm.tv_nsec = *last_time + board->sleep_time * 1000 - now;
+    // calculate amount of time difference
+    delta = now - *last_time;
+    if (*last_time > 0) {
+        // wait the configured amount of time, minus the time the loop took
+        sleep_tm.tv_nsec = config_sleep_time - delta;
         nanosleep(&sleep_tm, NULL);
     }
     // obtain current time after waiting and store for next call

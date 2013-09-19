@@ -3,7 +3,6 @@
 
 typedef struct {
     int toroidal;
-    long long int sleep_time;
     int width, height;
     int *cells;
 } Board_t;

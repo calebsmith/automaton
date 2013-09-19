@@ -29,14 +29,7 @@ void board_init(Board_t* board, const char* filename)
         printf("Could not open file %s\n", filename);
         exit(EXIT_STATUS_NO_FILE);
     } else {
-        if((fscanf(infile, "%d", &board->toroidal)) != 1) {
-            printf("Bad file format\n");
-            exit(EXIT_STATUS_BAD_FILE);
-        }
-        if((fscanf(infile, "%lld", &board->sleep_time)) != 1) {
-            printf("Bad file format\n");
-            exit(EXIT_STATUS_BAD_FILE);
-        }
+        board->toroidal = 0;
         if((fscanf(infile, "%d", &board->width)) != 1) {
             printf("Bad file format\n");
             exit(EXIT_STATUS_BAD_FILE);
@@ -87,7 +80,6 @@ void board_copy(Board_t* board_a, const Board_t* board_b)
     int size;
 
     board_a->toroidal = board_b->toroidal;
-    board_a->sleep_time = board_b->sleep_time;
     board_a->width = board_b->width;
     board_a->height = board_b->height;
     size = board_a->width * board_a->height;

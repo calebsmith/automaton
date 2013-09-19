@@ -56,8 +56,6 @@ gameoflife with the gosper_gun data file.
 
 The data file is of the following format::
 
-    toroidal flag (0 for non-toroidal, 1 for toroidal)
-    microseconds of wait time between generations
     width
     heigth
     zeros and ones for living and dead cells. Each line should be as wide as
@@ -65,8 +63,6 @@ The data file is of the following format::
 
 The following is an example data file::
 
-    0
-    55000
     8
     8
     00000000
@@ -79,6 +75,12 @@ The following is an example data file::
     00000000
 
 See data/gosper_gun.dat for a more practical example
+
+Command line flags include:
+
+* -t, --toroidal - Make the board toroidal (wrap around)
+* -s number, --speed=number - Set the amount of milliseconds between
+    generations.
 
 Authors
 -------
