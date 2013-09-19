@@ -79,7 +79,7 @@ See data/gosper_gun.dat for a more practical example
 Command line flags include:
 
 * -t, --toroidal - Make the board toroidal (wrap around)
-* -s number, --speed=number - Set the amount of milliseconds between
+* -s number, --speed=number - Set the amount of microseconds between
     generations.
 
 Authors

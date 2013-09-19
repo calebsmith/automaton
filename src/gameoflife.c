@@ -219,8 +219,8 @@ void generate(Board_t* next_board, Board_t* board)
 
 
 /*
- * Wait for board's <sleep_time> adjusted by the difference of the current time
- * and the finishing time of the last loop execution.
+ * Wait for config's <sleep_time> adjusted by the difference of the current
+ * time and the finishing time of the last loop execution.
  *
  * Note: This implementation is POSIX only.
  *
