@@ -132,25 +132,11 @@ void generate(Board_t* next_board, Board_t* board)
     int index;
     int num_neighbors;
     int current_cell;
-    int x_lower_bound, x_higher_bound;
-    int y_lower_bound, y_higher_bound;
 
-    // Determine boundaries of the board based on its toroidal flag
-    if (board->toroidal) {
-        x_lower_bound = 0;
-        y_lower_bound = 0;
-        x_higher_bound = board->width;
-        y_higher_bound = board->height;
-    } else {
-        x_lower_bound = 1;
-        y_lower_bound = 1;
-        x_higher_bound = board->width - 1;
-        y_higher_bound = board->height - 1;
-    }
     // Visit each cell, count its neighbors and determine its living/dead
     // status in the next generation. Then apply to the next_board
-    for(y = y_lower_bound; y < y_higher_bound; y++) {
-        for(x = x_lower_bound; x < x_higher_bound; x++) {
+    for(y = 0; y < board->height; y++) {
+        for(x = 0; x < board->width; x++) {
             num_neighbors = board_count_moore_neighbors(board, x, y);
             index = y * board->width + x;
             current_cell = board_get_cell(board, x, y);

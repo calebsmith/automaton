@@ -114,9 +114,9 @@ void board_swap(Board_t* board_a, Board_t* board_b)
 
 /*
  * Given a Board_t* and x,y coordinates, returns the value of the cell at that
- * location. If the x,y is out of bounds for the board, a toroidal
- * interpretation of the coordinates is assumed (wraps around to the other side
- * of the board).
+ * location. If the board is toroidal and x,y is out of bounds, the coordinates
+ * will wrap around to the other side of board. Otherwise, out of bounds
+ * coordinates will return 0
  *
  * Parameters: const Board_t* board, int x, int y
  * Side-Effects: None
@@ -125,17 +125,22 @@ void board_swap(Board_t* board_a, Board_t* board_b)
 int board_get_cell(const Board_t* board, int x, int y)
 {
     int index;
-    if (x >= board->width) {
-        x -= board->width;
-    }
-    if (x < 0) {
-        x += board->width;
-    }
-    if (y >= board->height) {
-        y -= board->height;
-    }
-    if (y < 0) {
-        y += board->height;
+
+    if (board->toroidal) {
+        if (x >= board->width) {
+            x -= board->width;
+        }
+        if (x < 0) {
+            x += board->width;
+        }
+        if (y >= board->height) {
+            y -= board->height;
+        }
+        if (y < 0) {
+            y += board->height;
+        }
+    } else if (x >= board->width || x < 0 || y >= board->height || y < 0) {
+        return 0;
     }
     index = y * board->width + x;
     return board->cells[index];
