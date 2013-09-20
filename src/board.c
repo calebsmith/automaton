@@ -13,52 +13,102 @@
  * board_copy must be called before use. board_destroy should be called on
  * the board when it is no longer in use.
  *
- * Parameters: Board_t* board, const char* filename
+ * Parameters: Board_t* board, const char* filename, int toroidal
  * Side-effects: Opens the <filename> file, and if successful initializes the
  *     board with data. Exits the program if the file cannot be found or is not
  *     a proper format
  */
-void board_init(Board_t* board, const char* filename)
+void board_init(Board_t* board, const char* filename, int toroidal)
 {
     int i = 0;
-    int current_cell;
-    int size;
+    int j = 0;
+    int x, y;
+    int width, height;
+    int num_cells;
+    int* cells;
+    int current_cell = 0;
     FILE *infile;
 
     if ((infile = fopen(filename, "r")) == NULL) {
         printf("Could not open file %s\n", filename);
         exit(EXIT_STATUS_NO_FILE);
     } else {
-        board->toroidal = 0;
-        if((fscanf(infile, "%d", &board->width)) != 1) {
+        board->toroidal = toroidal;
+        if((fscanf(infile, "%d", &width)) != 1) {
             printf("Bad file format\n");
             exit(EXIT_STATUS_BAD_FILE);
         }
-        if((fscanf(infile, "%d", &board->height)) != 1) {
+        if((fscanf(infile, "%d", &height)) != 1) {
             printf("Bad file format\n");
             exit(EXIT_STATUS_BAD_FILE);
         }
-        if ((board->width > 1024 || board->width < 5) ||
-            (board->height > 768 || board->height < 5)) {
+        if ((width > 640 || width < 5) ||
+            (height > 480 || height < 5)) {
             printf("Invalid width/height data.\n"
-                "Must be 5 < x < 1024 and 5 < y < 768\n"
+                "Must be 5 < x < 640 and 5 < y < 480\n"
             );
             exit(EXIT_STATUS_BAD_FILE);
         }
-        size = board->width * board->height;
-        board->cells = (int *) malloc(size * sizeof(int));
+        num_cells = width * height;
+        cells = (int *) malloc(num_cells * sizeof(int));
         while((current_cell = fgetc(infile)) != EOF) {
-            if (i > size) {
-                printf("File contains too many values\n");
+            if (i > num_cells) {
+                printf("File contains too many cell values\n");
                 exit(EXIT_STATUS_BAD_FILE);
             }
             current_cell -= '0';
             if (current_cell == 0 || current_cell == 1) {
-                board->cells[i++] = current_cell;
+                cells[i++] = current_cell;
             }
+        }
+        if (i < num_cells - 1) {
+            printf("File contains too few cell values\n");
+            exit(EXIT_STATUS_BAD_FILE);
         }
     }
     fclose(infile);
+
+    board->width = width;
+    board->height = height;
+    board->display_width = width;
+    board->display_height = height;
+
+    if (toroidal == 0) {
+        board->width += BOARD_BORDER_SIZE * 2;
+        board->height += BOARD_BORDER_SIZE * 2;
+        board->display_x = BOARD_BORDER_SIZE;
+        board->display_y = BOARD_BORDER_SIZE;
+        board->display_width += BOARD_BORDER_SIZE;
+        board->display_height += BOARD_BORDER_SIZE;
+    } else {
+        board->display_x = 0;
+        board->display_y = 0;
+    }
+    board->size = board->width * board->height;
+    board->cells = (int *) malloc(board->size * sizeof(int));
+    if (toroidal) {
+        for(i = 0; i < num_cells; i++) {
+            board->cells[i] = cells[i];
+        }
+    } else {
+        i = 0;
+        j = 0;
+        for(y = 0; y < board->height; y++) {
+            for(x = 0; x < board->width; x++) {
+                if (x < BOARD_BORDER_SIZE ||
+                    x >= board->display_width ||
+                    y < BOARD_BORDER_SIZE ||
+                    y >= board->display_height) {
+                        board->cells[i] = 0;
+                } else {
+                    board->cells[i] = cells[j];
+                    j++;
+                }
+                i++;
+            }
+        }
+    }
+    free(cells);
 }
 
 /*

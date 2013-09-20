@@ -56,8 +56,7 @@ int main(int argc, char* argv[])
     Config_t config = get_config(argc, argv);
     // Create a game board, and a next board
     Board_t board, next_board;
-    board_init(&board, config.filename);
-    board.toroidal = config.toroidal;
+    board_init(&board, config.filename, config.toroidal);
     board_copy(&next_board, &board);
 
     window = init_curses();
@@ -147,19 +146,22 @@ WINDOW* init_curses(void)
 void display(const Board_t* board, WINDOW* window)
 {
     int x, y;
+    int display_x, display_y;
     int display_width, display_height;
     int value;
 
     // clear the display of the old frame
     clear();
-    for(y = 0; y < board->height; y++) {
-        for(x = 0; x < board->width; x++) {
-            // display 0 for each living cell, space for each dead cell
+    for(y = board->display_y; y < board->display_height; y++) {
+        for(x = board->display_x; x < board->display_width; x++) {
+            // display o for each living cell
             value = board_get_cell(board, x, y);
-            move(y, x);
+            display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
+            display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
+            move(display_y, display_x);
             // determine terminal's rows and columns. Display cell if in bounds
             getmaxyx(window, display_height, display_width);
-            if (y < display_height && x < display_width) {
+            if (display_y < display_height && display_x < display_width) {
                 if (value == LIVE) {
                     insch('o');
                 }
