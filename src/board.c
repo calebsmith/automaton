@@ -25,7 +25,7 @@ void board_init(Board_t* board, const char* filename, int toroidal)
     int x, y;
     int width, height;
     int num_cells;
-    int* cells;
+    unsigned char* cells;
     int current_cell = 0;
     FILE *infile;
 
@@ -50,7 +50,7 @@ void board_init(Board_t* board, const char* filename, int toroidal)
             exit(EXIT_STATUS_BAD_FILE);
         }
         num_cells = width * height;
-        cells = (int *) malloc(num_cells * sizeof(int));
+        cells = malloc(num_cells * sizeof(unsigned char));
         while((current_cell = fgetc(infile)) != EOF) {
             if (i > num_cells) {
                 printf("File contains too many cell values\n");
@@ -85,7 +85,7 @@ void board_init(Board_t* board, const char* filename, int toroidal)
         board->display_y = 0;
     }
     board->size = board->width * board->height;
-    board->cells = (int *) malloc(board->size * sizeof(int));
+    board->cells = malloc(board->size * sizeof(unsigned char));
     if (toroidal) {
         for(i = 0; i < num_cells; i++) {
             board->cells[i] = cells[i];
@@ -133,7 +133,7 @@ void board_copy(Board_t* board_a, const Board_t* board_b)
     board_a->width = board_b->width;
     board_a->height = board_b->height;
     size = board_a->width * board_a->height;
-    board_a->cells = (int *) malloc(size * sizeof(int));
+    board_a->cells = malloc(size * sizeof(unsigned char));
     for(i = 0; i < size; i++) {
         board_a->cells[i] = board_b->cells[i];
     }
@@ -148,7 +148,7 @@ void board_copy(Board_t* board_a, const Board_t* board_b)
  */
 void board_swap(Board_t* board_a, Board_t* board_b)
 {
-    int* swap_cells;
+    unsigned char* swap_cells;
     swap_cells = board_a->cells;
     board_a->cells = board_b->cells;
     board_b->cells = swap_cells;

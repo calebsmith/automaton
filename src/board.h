@@ -9,7 +9,7 @@ typedef struct {
     int display_x, display_y;
     int display_width, display_height;
     int size;
-    int *cells;
+    unsigned char *cells;
 } Board_t;
 
 void board_init(Board_t* board, const char* filename, int toroidal);
