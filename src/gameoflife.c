@@ -86,34 +86,38 @@ Config_t get_config(int argc, char* argv[])
     int i;
     char *arg;
 
-    if (argc < 2) {
-        printf("Must provide a filename to a data file\n");
-        exit(1);
-    }
     config.toroidal = 0;
     config.sleep_time = DEFAULT_SLEEP_TIME;
 
-    for(i = 0; i < argc; i++) {
+    for(i = 1; i < argc; i++) {
         arg = argv[i];
-        if (i == argc - 1) {
+        if (strcmp(arg, "-t") == 0 || strcmp(arg, "--toroidal") == 0) {
+            // handle toroidal flag
+            config.toroidal = 1;
+        } else if (strcmp(arg, "-s") == 0) {
+            if (i + 1 < argc) {
+                // handle sleep time argument
+                config.sleep_time  = atoi(argv[i + 1]);
+                i++;
+            } else {
+                printf("-s option takes an argument\n");
+                exit(1);
+            }
+        } else if (strncmp(arg, "--sleep=", 8) == 0) {
+            arg = strtok(arg, "="); arg = strtok(NULL, "=");
+            config.sleep_time = atoi(arg);
+        } else {
             // handle filename argument
             config.filename = arg;
-        } else {
-            // handle toroidal flag
-           if (strcmp(arg, "-t") == 0 || strcmp(arg, "--toroidal") == 0) {
-               config.toroidal = 1;
-           }
-           // handle sleep time argument
-           if (strcmp(arg, "-s") == 0) {
-               config.sleep_time  = atoi(argv[i + 1]);
-           } else if (strncmp(arg, "--sleep=", 8) == 0) {
-               arg = strtok(arg, "="); arg = strtok(NULL, "=");
-               config.sleep_time = atoi(arg);
-           }
         }
     }
+    // error handling
     if (config.sleep_time == 0) {
         config.sleep_time = DEFAULT_SLEEP_TIME;
+    }
+    if (config.filename == NULL) {
+        printf("Must provide a filename to a data file\n");
+        exit(1);
     }
     return config;
 }
