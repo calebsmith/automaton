@@ -154,13 +154,14 @@ void display(const Board_t* board, WINDOW* window)
     clear();
     for(y = board->display_y; y < board->display_height; y++) {
         for(x = board->display_x; x < board->display_width; x++) {
-            // display o for each living cell
             value = board_get_cell(board, x, y);
+            // Adjust display coordinates by the BOARD_BORDER_SIZE offset
             display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
             display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
             move(display_y, display_x);
             // determine terminal's rows and columns. Display cell if in bounds
             getmaxyx(window, display_height, display_width);
+            // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {
                 if (value == LIVE) {
                     insch('o');

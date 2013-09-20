@@ -15,8 +15,11 @@
  *
  * Parameters: Board_t* board, const char* filename, int toroidal
  * Side-effects: Opens the <filename> file, and if successful initializes the
- *     board with data. Exits the program if the file cannot be found or is not
- *     a proper format
+ *     board with data. Uses the toroidal flag to determine if the board should
+ *     be toroidal or finite. Finite boards have extra memory allocated around
+ *     there border so that escaping cells don't interfere with the boundary of
+ *     the board. Exits the program if the file cannot be found or is not a
+ *     proper format
  */
 void board_init(Board_t* board, const char* filename, int toroidal)
 {
@@ -25,10 +28,12 @@ void board_init(Board_t* board, const char* filename, int toroidal)
     int x, y;
     int width, height;
     int num_cells;
+    int size;
     unsigned char* cells;
     int current_cell = 0;
     FILE *infile;
 
+    // Load the width, height and cell data from the file
     if ((infile = fopen(filename, "r")) == NULL) {
         printf("Could not open file %s\n", filename);
         exit(EXIT_STATUS_NO_FILE);
@@ -68,6 +73,8 @@ void board_init(Board_t* board, const char* filename, int toroidal)
     }
     fclose(infile);
 
+    // Use the toroidal flag, width, height and cell data to build
+    // the board's data
     board->width = width;
     board->height = height;
     board->display_width = width;
@@ -84,13 +91,16 @@ void board_init(Board_t* board, const char* filename, int toroidal)
         board->display_x = 0;
         board->display_y = 0;
     }
-    board->size = board->width * board->height;
-    board->cells = malloc(board->size * sizeof(unsigned char));
+    size = board->width * board->height;
+    board->cells = malloc(size * sizeof(unsigned char));
+    // for toroidal boards, simply copy each cell
     if (toroidal) {
         for(i = 0; i < num_cells; i++) {
             board->cells[i] = cells[i];
         }
     } else {
+        // non-toroidal boards are surrounded on all sides by 0's for
+        // BOARD_BORDER_SIZE columns/rows
         i = 0;
         j = 0;
         for(y = 0; y < board->height; y++) {

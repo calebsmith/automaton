@@ -5,10 +5,12 @@
 
 typedef struct {
     int toroidal;
+    // actual width, height in memory
     int width, height;
+    // x, y offsets for where to start displaying board data
     int display_x, display_y;
+    // x, y limits that mark the edge of where cells should be displayed
     int display_width, display_height;
-    int size;
     unsigned char *cells;
 } Board_t;
 
