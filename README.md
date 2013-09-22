@@ -32,6 +32,7 @@ For Debian GNU/Linux these are provided in the following packages:
  * gcc
  * make
  * libncurses5-dev
+ * libglfw-dev
 
 
 Installation
