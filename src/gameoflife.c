@@ -21,9 +21,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include <curses.h>
+#include <GL/glfw.h>
+#include <GL/gl.h>
 
 #include "board.h"
+
 
 const int LIVE = 1; // represents a living cell on the board.
 const int DEAD = 0; // represents a dead cell on the board.
@@ -31,47 +35,105 @@ const unsigned long long NANO = 1000000000; // convert nanoseconds to seconds
 // Default number of milliseconds to sleep
 const unsigned long long DEFAULT_SLEEP_TIME = 85000;
 
+const int WINDOW_WIDTH = 640;
+const int WINDOW_HEIGHT = 480;
+const int GL_WINDOW_EXIT = 4;
+
 // Stores command line arguments after parsing
 typedef struct {
+    int graphical;
     int toroidal;
     unsigned long long int sleep_time;
     const char* filename;
 } Config_t;
 
 Config_t get_config(int argc, char* argv[]);
-WINDOW* init_curses(void);
-void display(const Board_t* board, WINDOW* window);
 void generate(Board_t* next_board, Board_t* board);
 void wait(const Config_t* config, unsigned long long int* last_time);
+
+// curses frontend
+WINDOW* init_curses(void);
+void text_display(const Board_t* board, WINDOW* window);
+
+// GLFW frontend
+bool running = true;
+
+void GLFWCALL handle_escape(int key, int action);
+int GLFWCALL handle_window_close(void);
+int init_glfw(void);
+void render(Board_t* board);
+void make_quad(float x, float y, float size);
 
 
 int main(int argc, char* argv[])
 {
-    WINDOW* window; // the curses window
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
 
     // Parse the command line arguments and store into config
     Config_t config = get_config(argc, argv);
+
+
     // Create a game board, and a next board
     Board_t board, next_board;
     board_init(&board, config.filename, config.toroidal);
     board_copy(&next_board, &board);
 
-    window = init_curses();
-    // Display game board, find next generation, wait for time and loop
-    while(1) {
-        display(&board, window);
-        generate(&next_board, &board);
-        wait(&config, &last_time);
+    // Initialize frontend
+    WINDOW* window;
+    if (config.graphical == 0) {
+        window = init_curses();
+    } else {
+        if (init_glfw()) {
+            return GL_WINDOW_EXIT;
+        }
     }
-    endwin();
+    if (config.graphical == 0) {
+        // Display game board, find next generation, wait for time and loop
+        while(1) {
+            text_display(&board, window);
+            generate(&next_board, &board);
+            wait(&config, &last_time);
+        }
+    } else {
+        while(running) {
+            render(&board);
+            generate(&next_board, &board);
+        }
+    }
+
+    // destroy everything
+    if (config.graphical == 0) {
+        endwin();
+    } else {
+        glfwCloseWindow();
+        glfwTerminate();
+    }
     board_destroy(&board);
     board_destroy(&next_board);
     return 0;
 }
 
+int init_glfw(void) {
+    /* Initialize GLFW */
+    if (!glfwInit())
+        return GL_WINDOW_EXIT;
+
+    /* Create a windowed mode window and its OpenGL context */
+    if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, GLFW_WINDOW)) {
+        glfwTerminate();
+        return GL_WINDOW_EXIT;
+    }
+    glfwSetWindowTitle("gl");
+    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
+    glfwEnable(GLFW_AUTO_POLL_EVENTS);
+
+    // Register callbacks
+    glfwSetWindowCloseCallback(*handle_window_close);
+    glfwSetKeyCallback(*handle_escape);
+    return 0;
+}
 
 /*
  * Parses command line arguments and returns them in a Config_t.
@@ -86,6 +148,7 @@ Config_t get_config(int argc, char* argv[])
     int i;
     char *arg;
 
+    config.graphical = 0;
     config.toroidal = 0;
     config.sleep_time = DEFAULT_SLEEP_TIME;
 
@@ -94,6 +157,9 @@ Config_t get_config(int argc, char* argv[])
         if (strcmp(arg, "-t") == 0 || strcmp(arg, "--toroidal") == 0) {
             // handle toroidal flag
             config.toroidal = 1;
+        } else if (strncmp(arg, "-g", 2) == 0 ||
+            strncmp(arg, "--graphical", 11) == 0) {
+            config.graphical = 1;
         } else if (strcmp(arg, "-s") == 0) {
             if (i + 1 < argc) {
                 // handle sleep time argument
@@ -147,7 +213,7 @@ WINDOW* init_curses(void)
  * Parameters: Board_t* board, WINDOW* display_area
  * Return: void
  */
-void display(const Board_t* board, WINDOW* window)
+void text_display(const Board_t* board, WINDOW* window)
 {
     int x, y;
     int display_x, display_y;
@@ -257,4 +323,58 @@ void wait(const Config_t* config, unsigned long long int* last_time)
     // obtain current time after waiting and store for next call
     clock_gettime(CLOCK_REALTIME, &tm);
     *last_time = tm.tv_nsec + tm.tv_sec * NANO;
+}
+
+
+void GLFWCALL handle_escape(int key, int action)
+{
+    if (key == GLFW_KEY_ESC) {
+        running = false;
+    }
+}
+
+
+int GLFWCALL handle_window_close(void)
+{
+    running = false;
+    return GL_FALSE;
+}
+
+void render(Board_t* board) {
+    int x, y;
+    int display_x, display_y;
+    int value;
+
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBegin(GL_QUADS );
+    for(y = board->display_y; y < board->display_height; y++) {
+        for(x = board->display_x; x < board->display_width; x++) {
+            value = board_get_cell(board, x, y);
+            display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
+            display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
+            if (value == LIVE) {
+                make_quad(display_x, display_y, 4);
+            }
+        }
+    }
+    glEnd();
+    glfwSwapBuffers();
+}
+
+inline void make_quad(float x, float y, float size) {
+    // To change color uncomment
+    // glColor3f(255.0f, 0.0f, 255.0f);
+    //top-left vertex (corner)
+    glTexCoord2i(0, 0);
+    glVertex3f(x * size, y * size, 0.0f);
+    //top-right vertex (corner)
+    glTexCoord2i(1, 0);
+    glVertex3f(size + x * size, y * size, 0.f);
+    //bottom-right
+    glTexCoord2i(1, 1);
+    glVertex3f(size + x * size, size + y * size, 0.f);
+    //bottom-left
+    glTexCoord2i(0, 1);
+    glVertex3f(x * size, size + y * size, 0.f);
 }
