@@ -26,8 +26,9 @@ int init_glfw(void) {
         return GL_WINDOW_EXIT;
     }
     glfwSetWindowTitle("Game of Life");
-    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
+    glfwSwapInterval(0);
     glfwEnable(GLFW_AUTO_POLL_EVENTS);
+    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
 
     // Register callbacks
     glfwSetWindowCloseCallback(*handle_window_close);
