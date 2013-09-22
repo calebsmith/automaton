@@ -1,8 +1,11 @@
 Change log
 ==========
 
-v0.0.3 (Unreleased)
+v0.0.3
 -------------------
+    * Made non-toroidal board extend beyond the visible bounds, allowing e.g.
+        for escaping gliders to leave the visible board before colliding with
+        the boundary of the board in memory
     * Several small code style improvements.
     * Improved text display (made cursor invisible, replaced 0 with o.)
     * Made toroidal board and speed command line options rather than loading

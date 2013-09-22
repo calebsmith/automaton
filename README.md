@@ -76,11 +76,16 @@ The following is an example data file::
 
 See data/gosper_gun.dat for a more practical example
 
+The command format is:
+
+gameoflife [Options] seed_filename
+
 Command line flags include:
 
 * -t, --toroidal - Make the board toroidal (wrap around)
 * -s number, --speed=number - Set the amount of microseconds between
     generations.
+
 
 Authors
 -------
