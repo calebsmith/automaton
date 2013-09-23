@@ -25,6 +25,8 @@ Requirements
  * gcc 4.6.3
  * make 3.8.1
  * curses 5.9
+ * opengl
+ * glfw
 
 For Debian GNU/Linux these are provided in the following packages:
 
@@ -83,9 +85,19 @@ gameoflife [Options] seed_filename
 
 Command line flags include:
 
+* -g, --graphical - Use graphical mode (OpenGL rendering)
+* -f, --fullscreen - Use fullscreen rendering rather than windowed (pair with
+        -g option, otherwise has no effect)
 * -t, --toroidal - Make the board toroidal (wrap around)
 * -s number, --speed=number - Set the amount of microseconds between
-    generations.
+    generations. (Default is 85000)
+
+Examples:
+#Fast, full-screen graphical display
+./gameoflife -g -f -s 1000 data/gosper_gun.dat
+
+#Slow, toroidal terminal display
+./gameoflife -s 500000 data/r_pentomino.dat
 
 
 Authors
