@@ -3,7 +3,7 @@
 #include <curses.h>
 
 #include "board.h"
-#include "algo.h"
+#include "backend.h"
 #include "text_ui.h"
 
 

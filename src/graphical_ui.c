@@ -6,7 +6,7 @@
 #include <GL/gl.h>
 
 #include "board.h"
-#include "algo.h"
+#include "backend.h"
 #include "graphical_ui.h"
 
 

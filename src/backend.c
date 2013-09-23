@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "algo.h"
+#include "backend.h"
 
 /*
  * Wait for <sleep_time> adjusted by the difference of the current

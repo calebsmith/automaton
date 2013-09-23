@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <time.h>
 
 #include "board.h"
-#include "algo.h"
+#include "backend.h"
 #include "text_ui.h"
 #include "graphical_ui.h"
 
