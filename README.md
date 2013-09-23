@@ -2,7 +2,7 @@ gameoflife
 ==========
 
 A simple implementation of Conway's Game of Life in C
-
+![gameoflife](http://i.imgur.com/B0ElyTn.png)
 
 Notes
 -----
