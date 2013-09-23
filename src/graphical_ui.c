@@ -13,7 +13,9 @@
 bool running = true;
 
 
-int init_glfw(void) {
+int init_glfw(bool fullscreen) {
+
+    int glfw_flag = (fullscreen) ? GLFW_FULLSCREEN : GLFW_WINDOW;
 
     /* Initialize GLFW */
     if (!glfwInit()) {
@@ -21,7 +23,7 @@ int init_glfw(void) {
     }
 
     /* Create a windowed mode window and its OpenGL context */
-    if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, GLFW_WINDOW)) {
+    if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, glfw_flag)) {
         glfwTerminate();
         return GL_WINDOW_EXIT;
     }
@@ -37,13 +39,13 @@ int init_glfw(void) {
 }
 
 
-void main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time) {
+void main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
 
     // Initialize frontend
-    init_glfw();
+    init_glfw(fullscreen);
 
     // Display game board, find next generation, wait for time and loop
     while(running) {

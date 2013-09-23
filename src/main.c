@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 
@@ -30,6 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 // Stores command line arguments after parsing
 typedef struct {
+    bool fullscreen;
     int graphical;
     int toroidal;
     unsigned long long int sleep_time;
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
     board_copy(&next_board, &board);
 
     if (config.graphical) {
-        main_glfw(&board, &next_board, config.sleep_time * 1000);
+        main_glfw(&board, &next_board, config.sleep_time * 1000, config.fullscreen);
     } else {
         main_curses(&board, &next_board, config.sleep_time * 1000);
     }
@@ -72,6 +74,7 @@ Config_t get_config(int argc, char* argv[])
     int i;
     char *arg;
 
+    config.fullscreen = false;
     config.graphical = 0;
     config.toroidal = 0;
     config.sleep_time = DEFAULT_SLEEP_TIME;
@@ -82,8 +85,13 @@ Config_t get_config(int argc, char* argv[])
             // handle toroidal flag
             config.toroidal = 1;
         } else if (strncmp(arg, "-g", 2) == 0 ||
+            // handle graphical flag
             strncmp(arg, "--graphical", 11) == 0) {
             config.graphical = 1;
+        } else if (strncmp(arg, "-f", 2) == 0 ||
+            // handle graphical flag
+            strncmp(arg, "--fullscreen", 12) == 0) {
+            config.fullscreen = true;
         } else if (strcmp(arg, "-s") == 0) {
             if (i + 1 < argc) {
                 // handle sleep time argument
