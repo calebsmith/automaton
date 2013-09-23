@@ -7,6 +7,7 @@
 #include <GL/gl.h>
 
 #include "board.h"
+#include "backend.h"
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480

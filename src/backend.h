@@ -1,6 +1,8 @@
 #ifndef ALGO_H
 #define ALGO_H
 
+#include <time.h>
+
 #include "board.h"
 
 #define NANO 1000000000 // convert nanoseconds to seconds

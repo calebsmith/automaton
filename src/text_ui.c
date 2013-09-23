@@ -1,9 +1,3 @@
-#include <stdio.h>
-
-#include <curses.h>
-
-#include "board.h"
-#include "backend.h"
 #include "text_ui.h"
 
 

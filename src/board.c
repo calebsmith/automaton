@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "board.h"
 
 #define EXIT_STATUS_NO_FILE 1

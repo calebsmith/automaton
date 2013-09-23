@@ -1,12 +1,3 @@
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <GL/glfw.h>
-#include <GL/gl.h>
-
-#include "board.h"
-#include "backend.h"
 #include "graphical_ui.h"
 
 

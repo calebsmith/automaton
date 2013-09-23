@@ -1,7 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define BOARD_BORDER_SIZE 30
+
 
 typedef struct {
     int toroidal;

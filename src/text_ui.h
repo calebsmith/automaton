@@ -4,6 +4,7 @@
 #include <curses.h>
 
 #include "board.h"
+#include "backend.h"
 
 WINDOW* init_curses(void);
 void display_curses(const Board_t* board, WINDOW* window);
