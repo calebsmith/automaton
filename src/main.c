@@ -81,16 +81,17 @@ Config_t get_config(int argc, char* argv[])
 
     for(i = 1; i < argc; i++) {
         arg = argv[i];
-        if (strcmp(arg, "-t") == 0 || strcmp(arg, "--toroidal") == 0) {
+        if (strncmp(arg, "-t", 2) == 0 ||
+            strncmp(arg, "--toroidal", 10) == 0) {
             // handle toroidal flag
             config.toroidal = 1;
         } else if (strncmp(arg, "-g", 2) == 0 ||
-            // handle graphical flag
             strncmp(arg, "--graphical", 11) == 0) {
+            // handle graphical flag
             config.graphical = 1;
         } else if (strncmp(arg, "-f", 2) == 0 ||
-            // handle graphical flag
             strncmp(arg, "--fullscreen", 12) == 0) {
+            // handle fullscreen flag
             config.fullscreen = true;
         } else if (strcmp(arg, "-s") == 0) {
             if (i + 1 < argc) {
