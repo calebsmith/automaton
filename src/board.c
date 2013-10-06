@@ -1,24 +1,23 @@
 #include "board.h"
 
-#define EXIT_STATUS_NO_FILE 1
-#define EXIT_STATUS_BAD_FILE 2
+#define EXIT_STATUS_BAD_FILE 4
 
 
 /*
- * Given a Board_t pointer and a filename, loads seed data from the file and
+ * Given a Board_t pointer and a file handle, loads seed data from the file and
  * initializes the board struct with that data. To use a board, this or
  * board_copy must be called before use. board_destroy should be called on
  * the board when it is no longer in use.
  *
- * Parameters: Board_t* board, const char* filename, int toroidal
- * Side-effects: Opens the <filename> file, and if successful initializes the
- *     board with data. Uses the toroidal flag to determine if the board should
+ * Parameters: Board_t* board, FILE** infile, int toroidal
+ * Side-effects: Loads data from the file handel and initializes the with
+ *     data. Uses the toroidal flag to determine if the board should
  *     be toroidal or finite. Finite boards have extra memory allocated around
  *     there border so that escaping cells don't interfere with the boundary of
  *     the board. Exits the program if the file cannot be found or is not a
  *     proper format
  */
-void board_init(Board_t* board, const char* filename, int toroidal)
+void board_init(Board_t* board, FILE* infile, int toroidal)
 {
     int i = 0;
     int j = 0;
@@ -28,47 +27,40 @@ void board_init(Board_t* board, const char* filename, int toroidal)
     int size;
     unsigned char* cells;
     int current_cell = 0;
-    FILE *infile;
 
     // Load the width, height and cell data from the file
-    if ((infile = fopen(filename, "r")) == NULL) {
-        printf("Could not open file %s\n", filename);
-        exit(EXIT_STATUS_NO_FILE);
-    } else {
-        board->toroidal = toroidal;
-        if((fscanf(infile, "%d", &width)) != 1) {
-            printf("Bad file format\n");
+    board->toroidal = toroidal;
+    if((fscanf(infile, "%d", &width)) != 1) {
+        printf("Bad file format\n");
+        exit(EXIT_STATUS_BAD_FILE);
+    }
+    if((fscanf(infile, "%d", &height)) != 1) {
+        printf("Bad file format\n");
+        exit(EXIT_STATUS_BAD_FILE);
+    }
+    if ((width > 640 || width < 5) ||
+        (height > 480 || height < 5)) {
+        printf("Invalid width/height data.\n"
+            "Must be 5 < x < 640 and 5 < y < 480\n"
+        );
+        exit(EXIT_STATUS_BAD_FILE);
+    }
+    num_cells = width * height;
+    cells = malloc(num_cells * sizeof(unsigned char));
+    while((current_cell = fgetc(infile)) != EOF) {
+        if (i > num_cells) {
+            printf("File contains too many cell values\n");
             exit(EXIT_STATUS_BAD_FILE);
         }
-        if((fscanf(infile, "%d", &height)) != 1) {
-            printf("Bad file format\n");
-            exit(EXIT_STATUS_BAD_FILE);
-        }
-        if ((width > 640 || width < 5) ||
-            (height > 480 || height < 5)) {
-            printf("Invalid width/height data.\n"
-                "Must be 5 < x < 640 and 5 < y < 480\n"
-            );
-            exit(EXIT_STATUS_BAD_FILE);
-        }
-        num_cells = width * height;
-        cells = malloc(num_cells * sizeof(unsigned char));
-        while((current_cell = fgetc(infile)) != EOF) {
-            if (i > num_cells) {
-                printf("File contains too many cell values\n");
-                exit(EXIT_STATUS_BAD_FILE);
-            }
-            current_cell -= '0';
-            if (current_cell == 0 || current_cell == 1) {
-                cells[i++] = current_cell;
-            }
-        }
-        if (i < num_cells - 1) {
-            printf("File contains too few cell values\n");
-            exit(EXIT_STATUS_BAD_FILE);
+        current_cell -= '0';
+        if (current_cell == 0 || current_cell == 1) {
+            cells[i++] = current_cell;
         }
     }
-    fclose(infile);
+    if (i < num_cells - 1) {
+        printf("File contains too few cell values\n");
+        exit(EXIT_STATUS_BAD_FILE);
+    }
 
     // Use the toroidal flag, width, height and cell data to build
     // the board's data

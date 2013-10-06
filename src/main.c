@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "text_ui.h"
 #include "graphical_ui.h"
 
+#define EXIT_STATUS_NO_FILE 3
 
 // Stores command line arguments after parsing
 typedef struct {
@@ -47,7 +48,15 @@ int main(int argc, char* argv[])
 
     // Create a game board, and a next board
     Board_t board, next_board;
-    board_init(&board, config.filename, config.toroidal);
+    FILE *infile;
+
+    if ((infile = fopen(config.filename, "r")) == NULL) {
+        printf("Could not open file %s\n", config.filename);
+        exit(EXIT_STATUS_NO_FILE);
+    } else {
+        board_init(&board, infile, config.toroidal);
+        fclose(infile);
+    }
     board_copy(&next_board, &board);
 
     if (config.graphical) {
