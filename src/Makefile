@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -std=gnu99 -D _BSD_SOURCE
-LIBS = -lrt -lncurses
+CFLAGS = -Wall -std=gnu99 -D _BSD_SOURCE -O3
+LIBS = -lrt -lncurses -lglfw -lGL
 NAME = ../gameoflife
 SOURCES = *.c
 
