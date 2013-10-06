@@ -1,7 +1,5 @@
 #include "board.h"
 
-#define EXIT_STATUS_BAD_FILE 4
-
 
 /*
  * Given a Board_t pointer and a file handle, loads seed data from the file and
@@ -30,11 +28,11 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
 
     // Load the width, height and cell data from the file
     board->toroidal = toroidal;
-    if((fscanf(infile, "%d", &width)) != 1) {
+    if ((fscanf(infile, "%d", &width)) != 1) {
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);
     }
-    if((fscanf(infile, "%d", &height)) != 1) {
+    if ((fscanf(infile, "%d", &height)) != 1) {
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);
     }
@@ -47,7 +45,7 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
     }
     num_cells = width * height;
     cells = malloc(num_cells * sizeof(unsigned char));
-    while((current_cell = fgetc(infile)) != EOF) {
+    while ((current_cell = fgetc(infile)) != EOF) {
         if (i > num_cells) {
             printf("File contains too many cell values\n");
             exit(EXIT_STATUS_BAD_FILE);
@@ -84,7 +82,7 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
     board->cells = malloc(size * sizeof(unsigned char));
     // for toroidal boards, simply copy each cell
     if (toroidal) {
-        for(i = 0; i < num_cells; i++) {
+        for (i = 0; i < num_cells; i++) {
             board->cells[i] = cells[i];
         }
     } else {
@@ -92,8 +90,8 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
         // BOARD_BORDER_SIZE columns/rows
         i = 0;
         j = 0;
-        for(y = 0; y < board->height; y++) {
-            for(x = 0; x < board->width; x++) {
+        for (y = 0; y < board->height; y++) {
+            for (x = 0; x < board->width; x++) {
                 if (x < BOARD_BORDER_SIZE ||
                     x >= board->display_width ||
                     y < BOARD_BORDER_SIZE ||

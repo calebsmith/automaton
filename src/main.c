@@ -27,7 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "text_ui.h"
 #include "graphical_ui.h"
 
-#define EXIT_STATUS_NO_FILE 3
+#define EXIT_STATUS_TOO_FEW_ARGUMENTS 1
+#define EXIT_STATUS_NO_FILE 2
 
 // Stores command line arguments after parsing
 typedef struct {
@@ -124,7 +125,7 @@ Config_t get_config(int argc, char* argv[])
     }
     if (config.filename == NULL) {
         printf("Must provide a filename to a data file\n");
-        exit(1);
+        exit(EXIT_STATUS_TOO_FEW_ARGUMENTS);
     }
     return config;
 }

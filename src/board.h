@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define BOARD_BORDER_SIZE 30
-
+#define EXIT_STATUS_BAD_FILE 3
 
 typedef struct {
     int toroidal;

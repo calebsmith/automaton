@@ -2,6 +2,7 @@
 
 
 bool running = true;
+bool playing = true;
 
 
 int init_glfw(bool fullscreen) {
@@ -29,32 +30,46 @@ int init_glfw(bool fullscreen) {
 }
 
 
-void main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen) {
+int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
+    int return_value = 0;
 
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
         while (running) {
-            render(board);
-            generate(next_board, board);
-            wait(sleep_time, &last_time);
+            glfwSwapBuffers();
+            if (playing) {
+                render(board);
+                generate(next_board, board);
+                wait(sleep_time, &last_time);
+            }
         }
     } else {
         fprintf(stderr, "Failed to open a window for OpenGL rendering\n");
+        return_value = GL_WINDOW_EXIT;
     }
 
     // Destroy glfw
     glfwCloseWindow();
     glfwTerminate();
+    return return_value;
 }
 
 
 void GLFWCALL handle_escape(int key, int action)
 {
-    if (key == GLFW_KEY_ESC) {
-        running = false;
+    switch(key) {
+        case GLFW_KEY_ESC:
+            running = false;
+            break;
+        case 'P':
+            playing = false;
+            break;
+        case 'R':
+            playing = true;
+            break;
     }
 }
 
@@ -84,7 +99,6 @@ void render(Board_t* board) {
         }
     }
     glEnd();
-    glfwSwapBuffers();
 }
 
 inline void make_quad(float x, float y, float size) {
