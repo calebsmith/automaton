@@ -15,7 +15,6 @@ int init_glfw(bool fullscreen) {
 
     /* Create a windowed mode window and its OpenGL context */
     if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, glfw_flag)) {
-        glfwTerminate();
         return GL_WINDOW_EXIT;
     }
     glfwSetWindowTitle("Game of Life");
@@ -35,14 +34,15 @@ void main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
 
-    // Initialize frontend
-    init_glfw(fullscreen);
-
     // Display game board, find next generation, wait for time and loop
-    while(running) {
-        render(board);
-        generate(next_board, board);
-        wait(sleep_time, &last_time);
+    if (!init_glfw(fullscreen)) {
+        while (running) {
+            render(board);
+            generate(next_board, board);
+            wait(sleep_time, &last_time);
+        }
+    } else {
+        fprintf(stderr, "Failed to open a window for OpenGL rendering\n");
     }
 
     // Destroy glfw
