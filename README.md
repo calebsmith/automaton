@@ -34,6 +34,7 @@ For Debian GNU/Linux these are provided in the following packages:
  * gcc
  * make
  * libncurses5-dev
+ * libgl1-mesa-dev
  * libglfw-dev
 
 
