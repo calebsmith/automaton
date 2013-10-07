@@ -11,6 +11,7 @@ WINDOW* init_curses(void)
 {
     // create and prepare a curses window
     WINDOW* window = initscr();
+    nodelay(window, true);
     cbreak();
     noecho();
     curs_set(0);
@@ -23,15 +24,30 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
+    int playing = 1;    // Is the simulation "playing" or "paused"?
+    int running = 1;    // Should the simulation continue to run?
+    int current_char;   // What is the current keyboard input?
 
     // Initialize frontend
     WINDOW* window = init_curses();
 
     // Display game board, find next generation, wait for time and loop
-    while(1) {
-        display_curses(board, window);
-        generate(next_board, board);
-        wait(sleep_time, &last_time);
+    while(running) {
+        current_char = getch();
+        if (current_char == 27) {
+            running = 0;
+        }
+        if (current_char == 'p') {
+            playing = 0;
+        }
+        if (current_char == 'r') {
+            playing = 1;
+        }
+        if (playing) {
+            display_curses(board, window);
+            generate(next_board, board);
+            wait(sleep_time, &last_time);
+        }
     }
 
     // Destroy curses
