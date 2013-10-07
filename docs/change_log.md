@@ -1,6 +1,16 @@
 Change log
 ==========
 
+v0.0.4 (Oct 06 2013)
+-------------------
+    * Added an OpenGL front-end.
+    * Added key handling for pausing, resuming and exiting the simulation
+    * Made non-toroidal board larger than the display size to prevent the
+        border of the screen from interfering with escaping cells
+    * Improved exit codes and error reporting
+    * Split program into main, board, backend, textual_ui, and graphical_ui
+        source files
+
 v0.0.3
 -------------------
     * Made non-toroidal board extend beyond the visible bounds, allowing e.g.
