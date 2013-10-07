@@ -97,8 +97,17 @@ Examples:
 #Fast, full-screen graphical display
 ./gameoflife -g -f -s 1000 data/gosper_gun.dat
 
-#Slow, toroidal terminal display
+#Slow, toroidal textual display
 ./gameoflife -s 500000 data/r_pentomino.dat
+
+Usage During Runtime
+--------------------
+
+During program execution, the following keys have the corresponding effects:
+
+* escape - quit
+* p - pause
+* r - resume
 
 
 Authors
