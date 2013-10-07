@@ -25,6 +25,8 @@ Requirements
  * gcc 4.6.3
  * make 3.8.1
  * curses 5.9
+ * opengl
+ * glfw
 
 For Debian GNU/Linux these are provided in the following packages:
 
@@ -32,12 +34,14 @@ For Debian GNU/Linux these are provided in the following packages:
  * gcc
  * make
  * libncurses5-dev
+ * libgl1-mesa-dev
+ * libglfw-dev
 
 
 Installation
 ------------
 First, assure all requirements are met.
-To run, clone the repo, run make in the src folder, then run 'run_life.sh'::
+To run, clone the repo, run make in the src folder, then run 'run_life.sh'
 
     git clone git@github.com:calebsmith/gameoflife.git
     cd gameoflife/src
@@ -54,14 +58,14 @@ initial state (e.g. seed). Such files are provided with the repository in
 the /data folder. The run_life.sh shell command demonstrates running
 gameoflife with the gosper_gun data file.
 
-The data file is of the following format::
+The data file is of the following format
 
     width
     heigth
     zeros and ones for living and dead cells. Each line should be as wide as
         <width> and there should be as many lines as <height>
 
-The following is an example data file::
+The following is an example data file
 
     8
     8
@@ -82,9 +86,29 @@ gameoflife [Options] seed_filename
 
 Command line flags include:
 
+* -g, --graphical - Use graphical mode (OpenGL rendering)
+* -f, --fullscreen - Use fullscreen rendering rather than windowed (pair with
+        -g option, otherwise has no effect)
 * -t, --toroidal - Make the board toroidal (wrap around)
 * -s number, --speed=number - Set the amount of microseconds between
-    generations.
+    generations. (Default is 85000)
+
+Examples
+
+    #Fast, full-screen graphical display
+    ./gameoflife -g -f -s 1000 data/gosper_gun.dat
+    #Slow, toroidal textual display
+    ./gameoflife -s 500000 data/r_pentomino.dat
+
+
+Usage During Runtime
+--------------------
+
+During program execution, the following keys have the corresponding effects:
+
+* escape - quit
+* p - pause
+* r - resume
 
 
 Authors
