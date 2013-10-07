@@ -40,8 +40,8 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     if (!init_glfw(fullscreen)) {
         while (running) {
             glfwSwapBuffers();
+            render(board);
             if (playing) {
-                render(board);
                 generate(next_board, board);
                 wait(sleep_time, &last_time);
             }
