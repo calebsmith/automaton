@@ -62,6 +62,7 @@ void GLFWCALL handle_escape(int key, int action)
 {
     switch(key) {
         case GLFW_KEY_ESC:
+        case 'Q':
             running = false;
             break;
         case 'P':

@@ -23,7 +23,7 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
     now = tm.tv_nsec + tm.tv_sec * NANO;
     // calculate amount of time difference
     delta = now - *last_time;
-    if (*last_time > 0) {
+    if (sleep_time > 0 && *last_time > 0) {
         // wait the configured amount of time, minus the time the loop took
         sleep_tm.tv_nsec = sleep_time - delta;
         nanosleep(&sleep_tm, NULL);

@@ -106,7 +106,7 @@ Usage During Runtime
 
 During program execution, the following keys have the corresponding effects:
 
-* escape - quit
+* escape or q - quit
 * p - pause
 * r - resume
 

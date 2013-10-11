@@ -34,7 +34,7 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
     // Display game board, find next generation, wait for time and loop
     while(running) {
         current_char = getch();
-        if (current_char == 27) {
+        if (current_char == 27 || current_char == 'q') {
             running = 0;
         }
         if (current_char == 'p') {
