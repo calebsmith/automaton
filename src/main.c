@@ -143,7 +143,7 @@ Config_t get_config(int argc, char* argv[])
             config.fullscreen = true;
         } else if (strncmp(arg, "-h", 2) == 0 ||
             strncmp(arg, "--help", 6) == 0) {
-            // handle fullscreen flag
+            // handle help flag
             config.help = true;
         } else if (strcmp(arg, "-s") == 0) {
             if (i + 1 < argc) {
