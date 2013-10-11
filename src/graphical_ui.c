@@ -88,8 +88,8 @@ void render(Board_t* board) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBegin(GL_QUADS );
-    for(y = board->display_y; y < board->display_height; y++) {
-        for(x = board->display_x; x < board->display_width; x++) {
+    for(y = board->min_y; y < board->max_y; y++) {
+        for(x = board->min_x; x < board->max_x; x++) {
             value = board_get_cell(board, x, y);
             display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
             display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;

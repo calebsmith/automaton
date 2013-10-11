@@ -64,19 +64,19 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
     // the board's data
     board->width = width;
     board->height = height;
-    board->display_width = width;
-    board->display_height = height;
 
     if (toroidal == 0) {
         board->width += BOARD_BORDER_SIZE * 2;
         board->height += BOARD_BORDER_SIZE * 2;
-        board->display_x = BOARD_BORDER_SIZE;
-        board->display_y = BOARD_BORDER_SIZE;
-        board->display_width += BOARD_BORDER_SIZE;
-        board->display_height += BOARD_BORDER_SIZE;
+        board->min_x = BOARD_BORDER_SIZE;
+        board->min_y = BOARD_BORDER_SIZE;
+        board->max_x = width + BOARD_BORDER_SIZE;
+        board->max_y = height + BOARD_BORDER_SIZE;
     } else {
-        board->display_x = 0;
-        board->display_y = 0;
+        board->min_x = 0;
+        board->min_y = 0;
+        board->max_x = width;
+        board->max_y = height;
     }
     size = board->width * board->height;
     board->cells = malloc(size * sizeof(unsigned char));
@@ -93,9 +93,9 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
         for (y = 0; y < board->height; y++) {
             for (x = 0; x < board->width; x++) {
                 if (x < BOARD_BORDER_SIZE ||
-                    x >= board->display_width ||
+                    x >= board->max_x ||
                     y < BOARD_BORDER_SIZE ||
-                    y >= board->display_height) {
+                    y >= board->max_y) {
                         board->cells[i] = 0;
                 } else {
                     board->cells[i] = cells[j];

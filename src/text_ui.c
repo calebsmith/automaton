@@ -69,8 +69,8 @@ void display_curses(const Board_t* board, WINDOW* window)
 
     // clear the display of the old frame
     clear();
-    for(y = board->display_y; y < board->display_height; y++) {
-        for(x = board->display_x; x < board->display_width; x++) {
+    for(y = board->min_y; y < board->max_y; y++) {
+        for(x = board->min_x; x < board->max_x; x++) {
             value = board_get_cell(board, x, y);
             // Adjust display coordinates by the BOARD_BORDER_SIZE offset
             display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
