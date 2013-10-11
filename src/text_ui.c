@@ -66,18 +66,27 @@ void display_curses(const Board_t* board, WINDOW* window)
     int display_x, display_y;
     int display_width, display_height;
     int value;
+    Lens_t lens;
+
+    // determine terminal's rows and columns. Display cell if in bounds
+    getmaxyx(window, display_height, display_width);
+    if (display_height > 43) {
+        display_height = 43;
+    }
+    if (display_width > 132) {
+        display_width = 132;
+    }
+    lens_set(&lens, board, display_width, display_height, false);
 
     // clear the display of the old frame
     clear();
-    for(y = board->min_y; y < board->max_y; y++) {
-        for(x = board->min_x; x < board->max_x; x++) {
+    for(y = lens.y; y < lens.width; y++) {
+        for(x = lens.x; x < lens.height; x++) {
             value = board_get_cell(board, x, y);
             // Adjust display coordinates by the BOARD_BORDER_SIZE offset
             display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
             display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
             move(display_y, display_x);
-            // determine terminal's rows and columns. Display cell if in bounds
-            getmaxyx(window, display_height, display_width);
             // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {
                 if (value != 0) {

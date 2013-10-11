@@ -4,6 +4,7 @@
 #include <curses.h>
 
 #include "board.h"
+#include "lens.h"
 #include "backend.h"
 
 WINDOW* init_curses(void);
