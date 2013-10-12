@@ -97,8 +97,8 @@ void render(Board_t* board, Lens_t* lens) {
     for(y = lens->min_y; y < lens->max_y; y++) {
         for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
-            display_x = x + lens->x_display_offset;
-            display_y = y + lens->y_display_offset;
+            display_x = x - lens->x_display_offset;
+            display_y = y - lens->y_display_offset;
             if (value != 0) {
                 make_quad(display_x, display_y, lens->scale);
             }

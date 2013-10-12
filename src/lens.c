@@ -41,35 +41,35 @@ void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
         lens->x_display_offset = lens->x_offset;
         lens->y_display_offset = lens->y_offset;
     } else {
-        lens->x_display_offset = lens->x_offset - BOARD_BORDER_SIZE;
-        lens->y_display_offset = lens->y_offset - BOARD_BORDER_SIZE;
+        lens->x_display_offset = lens->x_offset + BOARD_BORDER_SIZE;
+        lens->y_display_offset = lens->y_offset + BOARD_BORDER_SIZE;
     }
     // Offset the display so that its centered
-    lens->x_display_offset += ((width - diff_lens_x * lens->scale) / 2) / lens->scale;
-    lens->y_display_offset += ((height - diff_lens_y * lens->scale) / 2) / lens->scale;
+    lens->x_display_offset -= ((width - diff_lens_x * lens->scale) / 2) / lens->scale;
+    lens->y_display_offset -= ((height - diff_lens_y * lens->scale) / 2) / lens->scale;
 }
 
 void lens_move(Lens_t* lens, const Board_t* board, int direction)
 {
     switch(direction) {
         case LEFT:
-            if (lens->max_x < board->max_x) {
-                lens->x_offset++;
-            }
-            break;
-        case RIGHT:
             if (lens->min_x > board->min_x) {
                 lens->x_offset--;
             }
             break;
+        case RIGHT:
+            if (lens->max_x < board->max_x) {
+                lens->x_offset++;
+            }
+            break;
         case UP:
-            if (lens->max_y < board->max_y) {
-                lens->y_offset++;
+            if (lens->min_y > board->min_y) {
+                lens->y_offset--;
             }
             break;
         case DOWN:
-            if (lens->min_y > board->min_y) {
-                lens->y_offset--;
+            if (lens->max_y < board->max_y) {
+                lens->y_offset++;
             }
             break;
     }
