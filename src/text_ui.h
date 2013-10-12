@@ -8,7 +8,7 @@
 #include "backend.h"
 
 WINDOW* init_curses(void);
-void display_curses(const Board_t* board, WINDOW* window);
+void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window);
 void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sleep_time);
 
 #endif

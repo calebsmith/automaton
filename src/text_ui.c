@@ -31,6 +31,10 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
     // Initialize frontend
     WINDOW* window = init_curses();
 
+    Lens_t lens;
+    lens.x_offset = 0;
+    lens.y_offset = 0;
+
     // Display game board, find next generation, wait for time and loop
     while(running) {
         current_char = getch();
@@ -43,8 +47,20 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
         if (current_char == 'r') {
             playing = 1;
         }
+        if (current_char == 'h') {
+            lens_move_left(&lens, board);
+        }
+        if (current_char == 'l') {
+            lens_move_right(&lens, board);
+        }
+        if (current_char == 'j') {
+            lens_move_down(&lens, board);
+        }
+        if (current_char == 'k') {
+            lens_move_up(&lens, board);
+        }
         if (playing) {
-            display_curses(board, window);
+            display_curses(board, &lens, window);
             generate(next_board, board);
             wait(sleep_time, &last_time);
         }
@@ -60,27 +76,26 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
  * Parameters: Board_t* board, WINDOW* display_area
  * Return: void
  */
-void display_curses(const Board_t* board, WINDOW* window)
+void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window)
 {
     int x, y;
     int display_x, display_y;
     int display_width, display_height;
     int value;
-    Lens_t lens;
 
     // determine terminal's rows and columns. Display cell if in bounds
     getmaxyx(window, display_height, display_width);
-    lens_set(&lens, board, display_width, display_height);
+    lens_set(lens, board, display_width, display_height);
     // clear the display of the old frame
     clear();
-    for(y = lens.min_y; y < lens.max_y; y++) {
-        for(x = lens.min_x; x < lens.max_x; x++) {
+    for(y = lens->min_y; y < lens->max_y; y++) {
+        for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
             // Adjust display coordinates by the BOARD_BORDER_SIZE offset
             display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
             display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
-            display_x -= lens.x_offset;
-            display_y -= lens.y_offset;
+            display_x -= lens->x_offset;
+            display_y -= lens->y_offset;
             move(display_y, display_x);
             // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {
