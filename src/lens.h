@@ -8,10 +8,11 @@
 #include "board.h"
 
 typedef struct {
-    int x, y;
-    int width, height;
+    int min_x, min_y;
+    int max_x, max_y;
+    int x_offset, y_offset;
     int scale;
 } Lens_t;
 
-void lens_set(Lens_t* lens, const Board_t* board, int width, int height, bool scale);
+void lens_set(Lens_t* lens, const Board_t* board, int width, int height);
 #endif
