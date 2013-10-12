@@ -91,8 +91,8 @@ void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window)
         for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
             // Adjust display coordinates by the BOARD_BORDER_SIZE offset
-            display_x = x - lens->x_display_offset;
-            display_y = y - lens->y_display_offset;
+            display_x = x + lens->x_display_offset;
+            display_y = y + lens->y_display_offset;
             move(display_y, display_x);
             // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {

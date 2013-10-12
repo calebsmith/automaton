@@ -14,6 +14,7 @@ int init_glfw(bool fullscreen) {
         return GL_WINDOW_EXIT;
     }
 
+    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
     /* Create a windowed mode window and its OpenGL context */
     if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, glfw_flag)) {
         return GL_WINDOW_EXIT;
@@ -87,21 +88,19 @@ int GLFWCALL handle_window_close(void)
 void render(Board_t* board, Lens_t* lens) {
     float x, y;
     int display_x, display_y;
-    int display_width, display_height;
     int value;
 
-    glfwGetWindowSize(&display_width, &display_height);
-    lens_set(lens, board, display_width, display_height);
+    lens_set(lens, board, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glBegin(GL_QUADS );
+    glBegin(GL_QUADS);
     for(y = lens->min_y; y < lens->max_y; y++) {
         for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
-            display_x = x - lens->x_display_offset;
-            display_y = y - lens->y_display_offset;
+            display_x = x + lens->x_display_offset;
+            display_y = y + lens->y_display_offset;
             if (value != 0) {
-                make_quad(display_x, display_y, 1);
+                make_quad(display_x, display_y, lens->scale);
             }
         }
     }
