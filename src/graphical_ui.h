@@ -7,6 +7,7 @@
 #include <GL/gl.h>
 
 #include "board.h"
+#include "lens.h"
 #include "backend.h"
 
 #define WINDOW_WIDTH 640
@@ -17,7 +18,7 @@ void GLFWCALL handle_escape(int key, int action);
 int GLFWCALL handle_window_close(void);
 int init_glfw(bool fullscreen);
 int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen);
-void render(Board_t* board);
+void render(Board_t* board, Lens_t* lens);
 void make_quad(float x, float y, float size);
 
 #endif

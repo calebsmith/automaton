@@ -36,11 +36,14 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     unsigned long long last_time = 0;
     int return_value = 0;
 
+    Lens_t lens;
+    lens_init(&lens, board);
+
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
         while (running) {
             glfwSwapBuffers();
-            render(board);
+            render(board, &lens);
             if (playing) {
                 generate(next_board, board);
                 wait(sleep_time, &last_time);
@@ -81,21 +84,24 @@ int GLFWCALL handle_window_close(void)
     return GL_FALSE;
 }
 
-void render(Board_t* board) {
+void render(Board_t* board, Lens_t* lens) {
     float x, y;
     int display_x, display_y;
+    int display_width, display_height;
     int value;
 
+    glfwGetWindowSize(&display_width, &display_height);
+    lens_set(lens, board, display_width, display_height);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBegin(GL_QUADS );
-    for(y = board->min_y; y < board->max_y; y++) {
-        for(x = board->min_x; x < board->max_x; x++) {
+    for(y = lens->min_y; y < lens->max_y; y++) {
+        for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
-            display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
-            display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
+            display_x = x - lens->x_display_offset;
+            display_y = y - lens->y_display_offset;
             if (value != 0) {
-                make_quad(display_x, display_y, 4);
+                make_quad(display_x, display_y, 1);
             }
         }
     }
