@@ -66,11 +66,11 @@ void lens_move(Lens_t* lens, const Board_t* board, int direction)
             if (lens->max_y < board->max_y) {
                 lens->y_offset++;
             }
+            break;
         case DOWN:
             if (lens->min_y > board->min_y) {
                 lens->y_offset--;
             }
-            break;
             break;
     }
 }
