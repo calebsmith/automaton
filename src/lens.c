@@ -1,5 +1,13 @@
 #include "lens.h"
 
+void lens_init(Lens_t* lens, const Board_t* board)
+{
+    lens->x_offset = 0;
+    lens->y_offset = 0;
+    lens->x_display_offset = 0;
+    lens->y_display_offset = 0;
+}
+
 void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
 {
     int diff_board_x, diff_board_y;
@@ -17,10 +25,23 @@ void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
     lens->max_y = lens->min_y + diff_lens_y;
     lens->scale = 1;
 
-    // TODO: Auto center the lens. For now, just set at top left
-    //
     // TODO: set scale > 1 here depending on the number of times lens will
     // fit in the board
+
+
+    // Set display offset to match x,y offset, but apply BOARD_BORDER_SIZE for
+    // non-toroidal boards
+    if (board->toroidal) {
+        lens->x_display_offset = lens->x_offset;
+        lens->y_display_offset = lens->y_offset;
+    } else {
+        lens->x_display_offset = lens->x_offset + BOARD_BORDER_SIZE;
+        lens->y_display_offset = lens->y_offset + BOARD_BORDER_SIZE;
+    }
+    // Offset the display so that its centered
+    lens->x_display_offset -= (width - diff_lens_x) / 2;
+    lens->y_display_offset -= (height - diff_lens_y) / 2;
+
 }
 
 void lens_move(Lens_t* lens, const Board_t* board, int direction)
