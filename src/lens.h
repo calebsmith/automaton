@@ -35,7 +35,10 @@ typedef struct {
 
 } Lens_t;
 
+#define LENS_MOVEMENT_RATE 5
+
 // Constants for directions
+// TODO: Define these elsewhere for more general use
 #define UP 0
 #define DOWN 1
 #define LEFT 2

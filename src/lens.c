@@ -151,16 +151,16 @@ void lens_move(Lens_t* lens, int direction)
 {
     switch(direction) {
         case LEFT:
-            lens->x_offset--;
+            lens->x_offset -= LENS_MOVEMENT_RATE;
             break;
         case RIGHT:
-            lens->x_offset++;
+            lens->x_offset += LENS_MOVEMENT_RATE;
             break;
         case UP:
-            lens->y_offset--;
+            lens->y_offset -= LENS_MOVEMENT_RATE;
             break;
         case DOWN:
-            lens->y_offset++;
+            lens->y_offset += LENS_MOVEMENT_RATE;
             break;
     }
 }
