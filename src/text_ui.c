@@ -15,6 +15,7 @@ WINDOW* init_curses(void)
     cbreak();
     noecho();
     curs_set(0);
+    keypad(stdscr, TRUE);
     clear();
     return window;
 }
@@ -46,17 +47,17 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
         if (current_char == 'r') {
             playing = 1;
         }
-        if (current_char == 'h') {
+        if (current_char == 'h' || current_char == KEY_LEFT) {
             lens_move_left(&lens);
         }
-        if (current_char == 'l') {
-            lens_move_right(&lens);
-        }
-        if (current_char == 'j') {
+        if (current_char == 'j' || current_char == KEY_DOWN) {
             lens_move_down(&lens);
         }
-        if (current_char == 'k') {
+        if (current_char == 'k' || current_char == KEY_UP) {
             lens_move_up(&lens);
+        }
+        if (current_char == 'l' || current_char == KEY_RIGHT) {
+            lens_move_right(&lens);
         }
         if (playing) {
             display_curses(board, &lens, window);

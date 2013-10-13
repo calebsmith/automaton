@@ -76,12 +76,20 @@ void GLFWCALL handle_keys(int key, int action)
             playing = true;
             break;
         case 'H':
+        case GLFW_KEY_LEFT:
+            lens_move_left(&lens);
             break;
         case 'J':
+        case GLFW_KEY_DOWN:
+            lens_move_down(&lens);
             break;
         case 'K':
+        case GLFW_KEY_UP:
+            lens_move_up(&lens);
             break;
         case 'L':
+        case GLFW_KEY_RIGHT:
+            lens_move_right(&lens);
             break;
     }
 }
