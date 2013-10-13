@@ -3,6 +3,11 @@ Change log
 
 v0.0.5 (Unreleased)
 -------------------
+    * Added a "lens" to handle the display of the board. Allows for boards
+        larger than the display surface, and handles logic for zooming,
+        navigation, centering and so on.
+    * Added navigation of the "lens" across the board using hjkl (ala vim) and
+        arrow keys
     * Changed file format of seed data files to allow for easier creation of
         large sparse boards
 
@@ -10,8 +15,6 @@ v0.0.4 (Oct 06 2013)
 --------------------
     * Added an OpenGL front-end.
     * Added key handling for pausing, resuming and exiting the simulation
-    * Made non-toroidal board larger than the display size to prevent the
-        border of the screen from interfering with escaping cells
     * Improved exit codes and error reporting
     * Split program into main, board, backend, textual_ui, and graphical_ui
         source files
