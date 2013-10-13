@@ -13,17 +13,18 @@ typedef struct {
     int x_offset, y_offset; // amount of offset of lens from top-left of board
     // Amount to displace the display coordinates x,y from the x,y of board
     int x_display_offset, y_display_offset;
-    int scale;
+    int scale;              // size of each cell in pixels/characters
 
 } Lens_t;
 
+// Constants for directions
 #define UP 0
 #define DOWN 1
 #define LEFT 2
 #define RIGHT 3
 
 
-void lens_init(Lens_t* lens, const Board_t* board);
+void lens_init(Lens_t* lens);
 void lens_set(Lens_t* lens, const Board_t* board, int width, int height);
 void lens_move(Lens_t* lens, int direction);
 void lens_move_left(Lens_t* lens);

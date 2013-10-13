@@ -33,7 +33,7 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
     WINDOW* window = init_curses();
 
     Lens_t lens;
-    lens_init(&lens, board);
+    lens_init(&lens);
 
     // Display game board, find next generation, wait for time and loop
     while(running) {
@@ -105,5 +105,3 @@ void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window)
     }
     refresh();
 }
-
-

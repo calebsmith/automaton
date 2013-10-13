@@ -1,6 +1,10 @@
 #include "lens.h"
 
-void lens_init(Lens_t* lens, const Board_t* board)
+/*
+ * Initialize the values of the lens.
+ * Parameters: Lens_t* lens
+ */
+void lens_init(Lens_t* lens)
 {
     lens->x_offset = 0;
     lens->y_offset = 0;
@@ -8,6 +12,14 @@ void lens_init(Lens_t* lens, const Board_t* board)
     lens->y_display_offset = 0;
 }
 
+/*
+ * Adjusts lens to the size of the board and the current width and height of
+ * the display
+ *
+ * Parameters: Lens_t* lens, const Board_t* board, int width, int height
+ * Side-Effects: Sets all values of the lens based on the display width/height
+ *     and board size
+ */
 void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
 {
     int diff_board_x, diff_board_y;
@@ -61,6 +73,11 @@ void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
     lens->y_display_offset -= ((height - diff_lens_y * lens->scale) / 2) / lens->scale;
 }
 
+/*
+ * Changes the lens' x,y offsets based on the direction passed in
+ *
+ * Parameters: Lens_t* lens, int direction
+ */
 void lens_move(Lens_t* lens, int direction)
 {
     switch(direction) {
@@ -79,21 +96,25 @@ void lens_move(Lens_t* lens, int direction)
     }
 }
 
+// Shortcut for lens_move(lens, LEFT)
 void lens_move_left(Lens_t* lens)
 {
     lens_move(lens, LEFT);
 }
 
+// Shortcut for lens_move(lens, RIGHT)
 void lens_move_right(Lens_t* lens)
 {
     lens_move(lens, RIGHT);
 }
 
+// Shortcut for lens_move(lens, UP)
 void lens_move_up(Lens_t* lens)
 {
     lens_move(lens, UP);
 }
 
+// Shortcut for lens_move(lens, DOWN)
 void lens_move_down(Lens_t* lens)
 {
     lens_move(lens, DOWN);
