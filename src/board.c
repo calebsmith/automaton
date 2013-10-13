@@ -19,10 +19,9 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
 {
     int i = 0;
     int j = 0;
-    int x, y;
+    int x = 0, y = 0;
     int width, height;
     int num_cells;
-    int size;
     unsigned char* cells;
     int current_cell = 0;
 
@@ -36,35 +35,30 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);
     }
-    if ((width > 640 || width < 5) ||
-        (height > 480 || height < 5)) {
+    // TODO: change limits to something more reasonable, and document
+    if ((width > 2660 || width < 5) ||
+        (height > 768 * 2 || height < 5)) {
         printf("Invalid width/height data.\n"
-            "Must be 5 < x < 640 and 5 < y < 480\n"
+            "Must be 5 < x < 2660 and 5 < y < 768\n"
         );
         exit(EXIT_STATUS_BAD_FILE);
     }
     num_cells = width * height;
-    cells = malloc(num_cells * sizeof(unsigned char));
-    while ((current_cell = fgetc(infile)) != EOF) {
-        if (i > num_cells) {
-            printf("File contains too many cell values\n");
-            exit(EXIT_STATUS_BAD_FILE);
+    cells = (unsigned char*) calloc(num_cells, sizeof(unsigned char));
+    while (1) {
+        if (fscanf(infile, "%d:%d,%d", &current_cell, &x, &y) == 3) {
+            if (current_cell >= 0 && current_cell <= 255) {
+                cells[y * width + x] = current_cell;
+            }
+        } else {
+            break;
         }
-        current_cell -= '0';
-        if (current_cell == 0 || current_cell == 1) {
-            cells[i++] = current_cell;
-        }
-    }
-    if (i < num_cells - 1) {
-        printf("File contains too few cell values\n");
-        exit(EXIT_STATUS_BAD_FILE);
     }
 
     // Use the toroidal flag, width, height and cell data to build
     // the board's data
     board->width = width;
     board->height = height;
-
     if (toroidal == 0) {
         board->width += BOARD_BORDER_SIZE * 2;
         board->height += BOARD_BORDER_SIZE * 2;
@@ -78,8 +72,9 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
         board->max_x = width;
         board->max_y = height;
     }
-    size = board->width * board->height;
-    board->cells = malloc(size * sizeof(unsigned char));
+    board->cells = (unsigned char*) calloc(
+        board->width * board->height, sizeof(unsigned char)
+    );
     // for toroidal boards, simply copy each cell
     if (toroidal) {
         for (i = 0; i < num_cells; i++) {
