@@ -1,8 +1,13 @@
 Change log
 ==========
 
-v0.0.4 (Oct 06 2013)
+v0.0.5 (Unreleased)
 -------------------
+    * Changed file format of seed data files to allow for easier creation of
+        large sparse boards
+
+v0.0.4 (Oct 06 2013)
+--------------------
     * Added an OpenGL front-end.
     * Added key handling for pausing, resuming and exiting the simulation
     * Made non-toroidal board larger than the display size to prevent the
@@ -12,7 +17,7 @@ v0.0.4 (Oct 06 2013)
         source files
 
 v0.0.3
--------------------
+------
     * Made non-toroidal board extend beyond the visible bounds, allowing e.g.
         for escaping gliders to leave the visible board before colliding with
         the boundary of the board in memory
