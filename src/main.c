@@ -64,7 +64,9 @@ const char* USAGE_STRING = ""
 "* h / left-arrow - move view left\n"
 "* j / down-arrow - move view down\n"
 "* k / up-arrow - move view up\n"
-"* l / right-arrow - move view right\n";
+"* l / right-arrow - move view right\n"
+"* i - zoom-in (graphical mode only)\n"
+"* o - zoom-out (graphical mode only)\n";
 
 
 // Stores command line arguments after parsing
