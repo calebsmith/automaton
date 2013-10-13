@@ -58,28 +58,6 @@ initial state (e.g. seed). Such files are provided with the repository in
 the /data folder. The run_life.sh shell command demonstrates running
 gameoflife with the gosper_gun data file.
 
-The data file is of the following format
-
-    width
-    heigth
-    zeros and ones for living and dead cells. Each line should be as wide as
-        <width> and there should be as many lines as <height>
-
-The following is an example data file
-
-    8
-    8
-    00000000
-    01110100
-    01000000
-    00001100
-    00110100
-    01010100
-    00000000
-    00000000
-
-See data/gosper_gun.dat for a more practical example
-
 The command format is:
 
 gameoflife [Options] seed_filename
@@ -109,6 +87,38 @@ During program execution, the following keys have the corresponding effects:
 * escape or q - quit
 * p - pause
 * r - resume
+
+
+Seed data files
+---------------
+The data files that provide an initial state of the board have the following
+format
+
+    width,height
+    state:x,y
+    state:x,y
+    state:x,y
+    ...
+
+The following is an example data file
+
+    8,8
+    1:4,4
+    1:3,4
+    1:3,3
+
+Would have the general appearance of:
+
+    00000000
+    00000000
+    00000000
+    00010000
+    00011000
+    00000000
+    00000000
+    00000000
+
+See data/gosper_gun.dat for a more practical example
 
 
 Authors
