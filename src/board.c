@@ -17,90 +17,58 @@
  */
 void board_init(Board_t* board, FILE* infile, int toroidal)
 {
-    int i = 0;
-    int j = 0;
     int x = 0, y = 0;
     int width, height;
-    int num_cells;
-    unsigned char* cells;
-    int current_cell = 0;
+    int cell_state = 0;
 
-    // Load the width, height and cell data from the file
+    // Load the width, height
     board->toroidal = toroidal;
-    if ((fscanf(infile, "%d", &width)) != 1) {
-        printf("Bad file format\n");
-        exit(EXIT_STATUS_BAD_FILE);
-    }
-    if ((fscanf(infile, "%d", &height)) != 1) {
+    if ((fscanf(infile, "%d,%d", &width, &height)) != 2) {
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);
     }
     // TODO: change limits to something more reasonable, and document
-    if ((width > 2660 || width < 5) ||
-        (height > 768 * 2 || height < 5)) {
+    if ((width > MAX_WIDTH || width < MIN_WIDTH) ||
+        (height > MAX_HEIGHT || height < MIN_HEIGHT)) {
         printf("Invalid width/height data.\n"
-            "Must be 5 < x < 2660 and 5 < y < 768\n"
+            "Must be %d < x < %d and %d < y < %d\n",
+            MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT
         );
         exit(EXIT_STATUS_BAD_FILE);
     }
-    num_cells = width * height;
-    cells = (unsigned char*) calloc(num_cells, sizeof(unsigned char));
-    while (1) {
-        if (fscanf(infile, "%d:%d,%d", &current_cell, &x, &y) == 3) {
-            if (current_cell >= 0 && current_cell <= 255) {
-                cells[y * width + x] = current_cell;
-            }
-        } else {
-            break;
-        }
-    }
-
-    // Use the toroidal flag, width, height and cell data to build
-    // the board's data
+    // Use the toroidal flag, to determine actual width, height for the board
     board->width = width;
     board->height = height;
-    if (toroidal == 0) {
-        board->width += BOARD_BORDER_SIZE * 2;
-        board->height += BOARD_BORDER_SIZE * 2;
-        board->min_x = BOARD_BORDER_SIZE;
-        board->min_y = BOARD_BORDER_SIZE;
-        board->max_x = width + BOARD_BORDER_SIZE;
-        board->max_y = height + BOARD_BORDER_SIZE;
-    } else {
+    if (toroidal) {
         board->min_x = 0;
         board->min_y = 0;
         board->max_x = width;
         board->max_y = height;
+    } else {
+        // Put an empty border of BOARD_BORDER_SIZE around non-toroidal boards
+        board->width += BOARD_BORDER_SIZE * 2;
+        board->height += BOARD_BORDER_SIZE * 2;
+        board->min_x = BOARD_BORDER_SIZE;
+        board->min_y = BOARD_BORDER_SIZE;
+        board->max_x = board->min_x + width;
+        board->max_y = board->min_y + height;
     }
     board->cells = (unsigned char*) calloc(
         board->width * board->height, sizeof(unsigned char)
     );
-    // for toroidal boards, simply copy each cell
-    if (toroidal) {
-        for (i = 0; i < num_cells; i++) {
-            board->cells[i] = cells[i];
-        }
-    } else {
-        // non-toroidal boards are surrounded on all sides by 0's for
-        // BOARD_BORDER_SIZE columns/rows
-        i = 0;
-        j = 0;
-        for (y = 0; y < board->height; y++) {
-            for (x = 0; x < board->width; x++) {
-                if (x < BOARD_BORDER_SIZE ||
-                    x >= board->max_x ||
-                    y < BOARD_BORDER_SIZE ||
-                    y >= board->max_y) {
-                        board->cells[i] = 0;
-                } else {
-                    board->cells[i] = cells[j];
-                    j++;
-                }
-                i++;
+    // Load cell states in the format state:x,y from the file
+    while (fscanf(infile, "%d:%d,%d", &cell_state, &x, &y) == 3) {
+        if (cell_state >= 0 && cell_state <= MAX_STATE) {
+            if (x > width || y > height || x < 0 || y < 0) {
+                printf("Invalid x,y value: %d,%d is out of bounds\n", x, y);
+                free(board->cells);
+                exit(EXIT_STATUS_BAD_FILE);
             }
+            x += board->min_x;
+            y += board->min_y;
+            board->cells[y * board->width + x] = cell_state;
         }
     }
-    free(cells);
 }
 
 /*

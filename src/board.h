@@ -7,6 +7,12 @@
 #define BOARD_BORDER_SIZE 30
 #define EXIT_STATUS_BAD_FILE 3
 
+#define MAX_STATE 255
+#define MIN_WIDTH 5
+#define MIN_HEIGHT 5
+#define MAX_WIDTH 2660
+#define MAX_HEIGHT 768 * 2
+
 typedef struct {
     int toroidal;
     // actual width, height in memory
