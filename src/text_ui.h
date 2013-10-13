@@ -1,3 +1,8 @@
+/*
+ * The text_ui creates a console based front-end display using the curses
+ * library. This handles the display of board, as well as listening for
+ * keyboard events for program control flow/termination
+ */
 #ifndef TEXT_UI_H
 #define TEXT_UI_H
 

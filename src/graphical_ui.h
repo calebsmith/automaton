@@ -1,3 +1,9 @@
+/*
+ * A graphical front-end that handles input and displays the board in an OpenGL
+ * context of a window using the glfw library. This relies on OpenGL
+ * extensions, but should be somewhat portable since glfw handles input/window
+ * handling for GNU/Linux, MacOSX, and Windows
+ */
 #ifndef GRAPHICAL_UI_H
 #define GRAPHICAL_UI_H
 
