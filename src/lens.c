@@ -1,3 +1,21 @@
+/*
+ * The "lens" acts as a mediator between the front-end display and the data
+ * from the "board" that it shows. The lens determines these aspects of the
+ * display:
+ *
+ *     1. What portion of the board should be shown (allow user to navigate
+ *         around the board like moving a spyglass across a map).
+ *     2. If the area of the board that can been is smaller than the overall
+ *         display area, put it into the center
+ *     3. If the entire board is smaller than the display area, scale the
+ *         display of the board appropriately (i.e. zoom in)
+ *
+ * lens_init() should be called before anything else is used.
+ * lens_set() should be called each time at the beginning of the display
+ *     rendering function.
+ * lens_move() and its shortcut functions are used to move the lens around
+ *     on the board
+ */
 #include "lens.h"
 
 /*
