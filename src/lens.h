@@ -24,8 +24,10 @@ typedef struct {
 #define RIGHT 3
 
 
-void lens_init(Lens_t* lens);
+void lens_init(Lens_t* lens, const Board_t* board, int width, int height, bool scale);
 void lens_set(Lens_t* lens, const Board_t* board, int width, int height);
+void lens_set_offset_bounds(Lens_t* lens, const Board_t* board, int width, int height);
+void lens_set_dimensions(Lens_t* lens, const Board_t* board, int width, int height);
 void lens_move(Lens_t* lens, int direction);
 void lens_move_left(Lens_t* lens);
 void lens_move_right(Lens_t* lens);

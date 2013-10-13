@@ -1,30 +1,54 @@
 #include "lens.h"
 
 /*
- * Initialize the values of the lens.
- * Parameters: Lens_t* lens
+ * Initializes the values of the lens before it is used. `width` and `height`
+ * parameters are the expected values of the display width/height and `scale`
+ * determines if the lens should scale the display (zoom in).
+ *
+ * Currently, curses display doesn't support zooming, but the graphical display
+ * does
+ *
+ * Parameters: Lens_t* lens, const Board_t* board, int width, int height
+ * Side-Effects: Sets inital values for the lens' offsets, min and max values,
+ *     and scale (if scale is passed as true)
  */
-void lens_init(Lens_t* lens)
+void lens_init(Lens_t* lens, const Board_t* board, int width, int height, bool scale)
 {
+    int x_scale, y_scale;
+    int diff_lens_x;
+    int diff_lens_y;
+
     lens->x_offset = 0;
     lens->y_offset = 0;
     lens->x_display_offset = 0;
     lens->y_display_offset = 0;
+    lens_set(lens, board, width, height);
+
+    // set scale > 1 here depending on the number of times lens will fit in the
+    // board (only if scale is passed as true)
+    if (scale) {
+        diff_lens_x = lens->max_x - lens->min_x;
+        diff_lens_y = lens->max_y - lens->min_y;
+        x_scale = width / diff_lens_x;
+        y_scale = height / diff_lens_y;
+        lens->scale = (x_scale < y_scale) ? x_scale: y_scale;
+        if (lens->scale == 0) {
+            lens->scale = 1;
+        }
+    }
 }
 
 /*
- * Adjusts lens to the size of the board and the current width and height of
- * the display
+ * Assures x and y offsets are within bounds so the lens doesn't go over the
+ * edge of the board.
  *
  * Parameters: Lens_t* lens, const Board_t* board, int width, int height
- * Side-Effects: Sets all values of the lens based on the display width/height
- *     and board size
+ * Side-Effects: Sets x_offset and y_offset of the lens to a value in bounds
  */
-void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
+void lens_set_offset_bounds(Lens_t* lens, const Board_t* board, int width, int height)
 {
     int diff_board_x, diff_board_y;
     int diff_lens_x, diff_lens_y;
-    int x_scale, y_scale;
 
     // Determine width of board
     diff_board_x = board->max_x - board->min_x;
@@ -46,19 +70,50 @@ void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
     if (lens->y_offset < 0) {
         lens->y_offset = 0;
     }
+}
+
+/*
+ * Sets the boundaries of the lens based on the display and board size as
+ * well as the current amount of x,y offset.
+ *
+ * Parameters: Lens_t* lens, const Board_t* board, int width, int height
+ * Side-Effects: Sets min and max x,y values of the lens to indicate the
+ *     current boundaries of the lens
+ */
+void lens_set_dimensions(Lens_t* lens, const Board_t* board, int width, int height)
+{
+    int diff_board_x, diff_board_y;
+    int diff_lens_x, diff_lens_y;
+
+    // Determine width of board
+    diff_board_x = board->max_x - board->min_x;
+    diff_board_y = board->max_y - board->min_y;
+    // Determine visible size of lens (min of board size and display size)
+    diff_lens_x = (diff_board_x < width) ? diff_board_x: width;
+    diff_lens_y = (diff_board_y < height) ? diff_board_y: height;
+
     lens->min_x = lens->x_offset + board->min_x;
     lens->min_y = lens->y_offset + board->min_y;
     lens->max_x = lens->min_x + diff_lens_x;
     lens->max_y = lens->min_y + diff_lens_y;
+}
 
-    // set scale > 1 here depending on the number of times lens will
-    // fit in the board
-    x_scale = width / diff_lens_x;
-    y_scale = height / diff_lens_y;
-    lens->scale = (x_scale < y_scale) ? x_scale: y_scale;
-    if (lens->scale == 0) {
-        lens->scale = 1;
-    }
+/*
+ * Sets all values of the lens based on the current display parameters and
+ * board
+ *
+ * Parameters: Lens_t* lens, const Board_t* board, int width, int height
+ * Side-Effects: Sets all values of the lens based on the display width/height
+ *     and board size
+ */
+void lens_set(Lens_t* lens, const Board_t* board, int width, int height)
+{
+    int diff_lens_x, diff_lens_y;
+
+    lens_set_offset_bounds(lens, board, width, height);
+    lens_set_dimensions(lens, board, width, height);
+    diff_lens_x = lens->max_x - lens->min_x;
+    diff_lens_y = lens->max_y - lens->min_y;
     // Set display offset to match x,y offset, but apply BOARD_BORDER_SIZE for
     // non-toroidal boards
     if (board->toroidal) {

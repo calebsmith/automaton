@@ -38,7 +38,7 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     unsigned long long last_time = 0;
     int return_value = 0;
 
-    lens_init(&lens);
+    lens_init(&lens, board, WINDOW_WIDTH, WINDOW_HEIGHT, true);
 
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
