@@ -87,6 +87,10 @@ During program execution, the following keys have the corresponding effects:
 * escape or q - quit
 * p - pause
 * r - resume
+* h / left-arrow - move view left
+* j / down-arrow - move view down
+* k / up-arrow - move view up
+* l / right-arrow - move view right
 
 
 Seed data files

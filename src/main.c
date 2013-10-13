@@ -60,7 +60,11 @@ const char* USAGE_STRING = ""
 "\n"
 "* escape or q - quit\n"
 "* p - pause\n"
-"* r - resume\n";
+"* r - resume\n"
+"* h / left-arrow - move view left\n"
+"* j / down-arrow - move view down\n"
+"* k / up-arrow - move view up\n"
+"* l / right-arrow - move view right\n";
 
 
 // Stores command line arguments after parsing
