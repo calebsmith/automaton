@@ -3,6 +3,7 @@
 
 bool running = true;
 bool playing = true;
+Lens_t lens;
 
 
 int init_glfw(bool fullscreen) {
@@ -21,12 +22,12 @@ int init_glfw(bool fullscreen) {
     }
     glfwSetWindowTitle("Game of Life");
     glfwSwapInterval(0);
-    glfwEnable(GLFW_AUTO_POLL_EVENTS);
+    glfwDisable(GLFW_AUTO_POLL_EVENTS);
     glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
 
     // Register callbacks
     glfwSetWindowCloseCallback(*handle_window_close);
-    glfwSetKeyCallback(*handle_escape);
+    glfwSetKeyCallback(*handle_keys);
     return 0;
 }
 
@@ -37,13 +38,12 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     unsigned long long last_time = 0;
     int return_value = 0;
 
-    Lens_t lens;
     lens_init(&lens, board);
 
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
         while (running) {
-            glfwSwapBuffers();
+            glfwPollEvents();
             render(board, &lens);
             if (playing) {
                 generate(next_board, board);
@@ -62,7 +62,7 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
 }
 
 
-void GLFWCALL handle_escape(int key, int action)
+void GLFWCALL handle_keys(int key, int action)
 {
     switch(key) {
         case GLFW_KEY_ESC:
@@ -74,6 +74,14 @@ void GLFWCALL handle_escape(int key, int action)
             break;
         case 'R':
             playing = true;
+            break;
+        case 'H':
+            break;
+        case 'J':
+            break;
+        case 'K':
+            break;
+        case 'L':
             break;
     }
 }
@@ -105,6 +113,7 @@ void render(Board_t* board, Lens_t* lens) {
         }
     }
     glEnd();
+    glfwSwapBuffers();
 }
 
 inline void make_quad(float x, float y, float size) {

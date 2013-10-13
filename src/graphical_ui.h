@@ -14,7 +14,7 @@
 #define WINDOW_HEIGHT 768
 #define GL_WINDOW_EXIT 4
 
-void GLFWCALL handle_escape(int key, int action);
+void GLFWCALL handle_keys(int key, int action);
 int GLFWCALL handle_window_close(void);
 int init_glfw(bool fullscreen);
 int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen);

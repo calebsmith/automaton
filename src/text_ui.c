@@ -47,16 +47,16 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
             playing = 1;
         }
         if (current_char == 'h') {
-            lens_move_left(&lens, board);
+            lens_move_left(&lens);
         }
         if (current_char == 'l') {
-            lens_move_right(&lens, board);
+            lens_move_right(&lens);
         }
         if (current_char == 'j') {
-            lens_move_down(&lens, board);
+            lens_move_down(&lens);
         }
         if (current_char == 'k') {
-            lens_move_up(&lens, board);
+            lens_move_up(&lens);
         }
         if (playing) {
             display_curses(board, &lens, window);
