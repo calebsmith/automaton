@@ -11,7 +11,7 @@
  * Side-effects: Loads data from the file handel and initializes the with
  *     data. Uses the toroidal flag to determine if the board should
  *     be toroidal or finite. Finite boards have extra memory allocated around
- *     there border so that escaping cells don't interfere with the boundary of
+ *     their border so that escaping cells don't interfere with the boundary of
  *     the board. Exits the program if the file cannot be found or is not a
  *     proper format
  */
@@ -27,7 +27,9 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);
     }
-    // TODO: change limits to something more reasonable, and document
+    /*
+     * TODO: change limits to something more reasonable, and document
+     */
     if ((width > MAX_WIDTH || width < MIN_WIDTH) ||
         (height > MAX_HEIGHT || height < MIN_HEIGHT)) {
         printf("Invalid width/height data.\n"
