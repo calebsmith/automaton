@@ -91,8 +91,6 @@ During program execution, the following keys have the corresponding effects:
 * j / down-arrow - move view down
 * k / up-arrow - move view up
 * l / right-arrow - move view right
-* i - zoom-in (graphical mode only)
-* o - zoom-out (graphical mode only)
 
 
 Seed data files
