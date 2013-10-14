@@ -3,6 +3,7 @@
 
 bool running = true;
 bool playing = true;
+Lens_t lens;
 
 
 int init_glfw(bool fullscreen) {
@@ -14,18 +15,19 @@ int init_glfw(bool fullscreen) {
         return GL_WINDOW_EXIT;
     }
 
+    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
     /* Create a windowed mode window and its OpenGL context */
     if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, glfw_flag)) {
         return GL_WINDOW_EXIT;
     }
     glfwSetWindowTitle("Game of Life");
     glfwSwapInterval(0);
-    glfwEnable(GLFW_AUTO_POLL_EVENTS);
+    glfwDisable(GLFW_AUTO_POLL_EVENTS);
     glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
 
     // Register callbacks
     glfwSetWindowCloseCallback(*handle_window_close);
-    glfwSetKeyCallback(*handle_escape);
+    glfwSetKeyCallback(*handle_keys);
     return 0;
 }
 
@@ -36,11 +38,13 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     unsigned long long last_time = 0;
     int return_value = 0;
 
+    lens_init(&lens, board, WINDOW_WIDTH, WINDOW_HEIGHT, true);
+
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
         while (running) {
-            glfwSwapBuffers();
-            render(board);
+            glfwPollEvents();
+            render(board, &lens);
             if (playing) {
                 generate(next_board, board);
                 wait(sleep_time, &last_time);
@@ -58,10 +62,11 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
 }
 
 
-void GLFWCALL handle_escape(int key, int action)
+void GLFWCALL handle_keys(int key, int action)
 {
     switch(key) {
         case GLFW_KEY_ESC:
+        case 'Q':
             running = false;
             break;
         case 'P':
@@ -69,6 +74,22 @@ void GLFWCALL handle_escape(int key, int action)
             break;
         case 'R':
             playing = true;
+            break;
+        case 'H':
+        case GLFW_KEY_LEFT:
+            lens_move_left(&lens);
+            break;
+        case 'J':
+        case GLFW_KEY_DOWN:
+            lens_move_down(&lens);
+            break;
+        case 'K':
+        case GLFW_KEY_UP:
+            lens_move_up(&lens);
+            break;
+        case 'L':
+        case GLFW_KEY_RIGHT:
+            lens_move_right(&lens);
             break;
     }
 }
@@ -80,25 +101,27 @@ int GLFWCALL handle_window_close(void)
     return GL_FALSE;
 }
 
-void render(Board_t* board) {
+void render(Board_t* board, Lens_t* lens) {
     float x, y;
     int display_x, display_y;
     int value;
 
+    lens_set(lens, board, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glBegin(GL_QUADS );
-    for(y = board->display_y; y < board->display_height; y++) {
-        for(x = board->display_x; x < board->display_width; x++) {
+    glBegin(GL_QUADS);
+    for(y = lens->min_y; y < lens->max_y; y++) {
+        for(x = lens->min_x; x < lens->max_x; x++) {
             value = board_get_cell(board, x, y);
-            display_x = (!board->toroidal) ? x - BOARD_BORDER_SIZE : x;
-            display_y = (!board->toroidal) ? y - BOARD_BORDER_SIZE : y;
+            display_x = x - lens->x_display_offset;
+            display_y = y - lens->y_display_offset;
             if (value != 0) {
-                make_quad(display_x, display_y, 4);
+                make_quad(display_x, display_y, lens->scale);
             }
         }
     }
     glEnd();
+    glfwSwapBuffers();
 }
 
 inline void make_quad(float x, float y, float size) {

@@ -1,5 +1,10 @@
-#ifndef ALGO_H
-#define ALGO_H
+/*
+ * Defines the basic operations of the "backend" portion of the program. (The
+ * back and frontends of the program are one process/one thread, but are
+ * separated into concerns regarding data (backend) and display (frontend).
+ */
+#ifndef BACKEND_H
+#define BACKEND_H
 
 #include <time.h>
 
