@@ -30,9 +30,49 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define EXIT_STATUS_TOO_FEW_ARGUMENTS 1
 #define EXIT_STATUS_NO_FILE 2
 
+
+const char* USAGE_STRING = ""
+"The command format is:\n"
+"\n"
+"gameoflife [Options] seed_filename\n"
+"\n"
+"Command line flags include:\n"
+"\n"
+"* -g, --graphical - Use graphical mode (OpenGL rendering)\n"
+"* -f, --fullscreen - Use fullscreen rendering rather than windowed (pair with\n"
+"        -g option, otherwise has no effect)\n"
+"* -t, --toroidal - Make the board toroidal (wrap around)\n"
+"* -s number, --speed=number - Set the amount of microseconds between\n"
+"    generations. (Default is 85000)\n"
+"\n"
+"Examples\n"
+"\n"
+"    #Fast, full-screen graphical display\n"
+"    ./gameoflife -g -f -s 1000 data/gosper_gun.dat\n"
+"    #Slow, toroidal textual display\n"
+"    ./gameoflife -s 500000 data/r_pentomino.dat\n"
+"\n"
+"\n"
+"Usage During Runtime\n"
+"--------------------\n"
+"\n"
+"During program execution, the following keys have the corresponding effects:\n"
+"\n"
+"* escape or q - quit\n"
+"* p - pause\n"
+"* r - resume\n"
+"* h / left-arrow - move view left\n"
+"* j / down-arrow - move view down\n"
+"* k / up-arrow - move view up\n"
+"* l / right-arrow - move view right\n"
+"* i - zoom-in (graphical mode only)\n"
+"* o - zoom-out (graphical mode only)\n";
+
+
 // Stores command line arguments after parsing
 typedef struct {
     bool fullscreen;
+    bool help;
     int graphical;
     int toroidal;
     unsigned long long int sleep_time;
@@ -46,6 +86,10 @@ int main(int argc, char* argv[])
 {
     // Parse the command line arguments and store into config
     Config_t config = get_config(argc, argv);
+    if (config.help) {
+        printf("%s", USAGE_STRING);
+        return 0;
+    }
 
     // Create a game board, and a next board
     Board_t board, next_board;
@@ -84,6 +128,7 @@ Config_t get_config(int argc, char* argv[])
     char *arg;
 
     config.fullscreen = false;
+    config.help = false;
     config.graphical = 0;
     config.toroidal = 0;
     config.sleep_time = DEFAULT_SLEEP_TIME;
@@ -102,6 +147,10 @@ Config_t get_config(int argc, char* argv[])
             strncmp(arg, "--fullscreen", 12) == 0) {
             // handle fullscreen flag
             config.fullscreen = true;
+        } else if (strncmp(arg, "-h", 2) == 0 ||
+            strncmp(arg, "--help", 6) == 0) {
+            // handle help flag
+            config.help = true;
         } else if (strcmp(arg, "-s") == 0) {
             if (i + 1 < argc) {
                 // handle sleep time argument
@@ -120,10 +169,7 @@ Config_t get_config(int argc, char* argv[])
         }
     }
     // error handling
-    if (config.sleep_time == 0) {
-        config.sleep_time = DEFAULT_SLEEP_TIME;
-    }
-    if (config.filename == NULL) {
+    if (config.filename == NULL && config.help == false) {
         printf("Must provide a filename to a data file\n");
         exit(EXIT_STATUS_TOO_FEW_ARGUMENTS);
     }
