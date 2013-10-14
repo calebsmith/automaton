@@ -188,17 +188,3 @@ void lens_move_down(Lens_t* lens)
 {
     lens_move(lens, DOWN);
 }
-
-void lens_zoom_in(Lens_t* lens)
-{
-    if (lens->scale < 20) {
-        lens->scale++;
-    }
-}
-
-void lens_zoom_out(Lens_t* lens)
-{
-    if (lens->scale > 1) {
-        lens->scale--;
-    }
-}
