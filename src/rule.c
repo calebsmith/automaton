@@ -113,13 +113,12 @@ int rule_init(Rule_t* rule, FILE* infile) {
     rule->transitions = malloc(num_transitions * sizeof(int*));
 
     for (i = 0; i < num_transitions; i++) {
-        if (fscanf(infile, "%s", line_buffer) == 1) {
+        if (fscanf(infile, "%80s", line_buffer) == 1) {
         } else {
             fprintf(stderr, "buffer is: %s\n", line_buffer);
             printf("Bad transition mapping in rule file on transition %d\n", i);
             return 1;
         }
-        fprintf(stderr, "buffer is: %s\n", line_buffer);
         if (sscanf(line_buffer, "%hd->%hd:%d", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states) ||
