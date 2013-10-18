@@ -160,13 +160,14 @@ int board_get_cell(const Board_t* board, int x, int y)
 
 /*
  * Given a Board_t pointer and x,y coordinates, returns the number
- * of living neighbors for the cell at x,y.
+ * of Moore neighbors for the cell at x,y (diagonally and orthoganally
+ * adjacent).
  *
  * Parameters: const Board_t* board, int x, int y
  * Side-Effects: None
  * Returns: int of the total number of neighbors
  */
-int board_count_moore_neighbors(const Board_t* board, int x, int y)
+int board_count_moore_neighbors(const Board_t* board, int x, int y, unsigned char state)
 {
     return (
         board_get_cell(board, x - 1, y - 1) +
@@ -177,6 +178,24 @@ int board_count_moore_neighbors(const Board_t* board, int x, int y)
         board_get_cell(board, x - 1, y + 1) +
         board_get_cell(board, x, y + 1) +
         board_get_cell(board, x + 1, y + 1)
+    );
+}
+
+/*
+ * Given a Board_t pointer and x,y coordinates, returns the number
+ * of Von Neumann neighbors for the cell at x,y (orthoganally adjacent).
+ *
+ * Parameters: const Board_t* board, int x, int y
+ * Side-Effects: None
+ * Returns: int of the total number of neighbors
+ */
+int board_count_von_neumann_neighbors(const Board_t* board, int x, int y, unsigned char state)
+{
+    return (
+        board_get_cell(board, x, y - 1) +
+        board_get_cell(board, x - 1, y) +
+        board_get_cell(board, x + 1, y) +
+        board_get_cell(board, x, y + 1)
     );
 }
 

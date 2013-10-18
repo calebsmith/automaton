@@ -36,10 +36,13 @@ int rule_init(Rule_t* rule, FILE* infile) {
     }
     // Read neighbor type definition
     if (fscanf(infile, "%20s", neighbor_string) == 1) {
-        if (strncmp(neighbor_string, "moore", 6)) {
+        if (strncmp(neighbor_string, "moore", 6) == 0) {
             rule->neighbor_type = NEIGHBOR_MOORE;
-        } else if (strncmp(neighbor_string, "von_neumann", 11)) {
+        } else if (strncmp(neighbor_string, "von_neumann", 11) == 0) {
             rule->neighbor_type = NEIGHBOR_VON_NEUMANN;
+        } else {
+            printf("Neighbor type is not valid");
+            return 1;
         }
     } else {
         printf("Neighbor type definition invalid or not found in rule file\n");

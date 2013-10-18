@@ -1,5 +1,10 @@
 #include "backend.h"
 
+NeighborFunction_t NEIGHBOR_FUNC_LOOKUP[] = {
+    [NEIGHBOR_MOORE]=&board_count_moore_neighbors,
+    [NEIGHBOR_VON_NEUMANN]=&board_count_von_neumann_neighbors
+};
+
 /*
  * Wait for <sleep_time> adjusted by the difference of the current
  * time and the finishing time of the last loop execution.
@@ -35,8 +40,7 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
 
 /*
  * Determines the next board based on the cells of the current one, then
- * swaps them to move to the next generation. Follows Conway's Game of Life
- * rules: B3/S23
+ * swaps them to move to the next generation.
  *
  * Parameters: Board_t* next_board, Board_t* board
  * Return: void
@@ -51,18 +55,19 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
     int current_cell;
     int i, j;
     bool changed;
+    NeighborFunction_t neighbor_count_func;
+
+    neighbor_count_func = NEIGHBOR_FUNC_LOOKUP[rule->neighbor_type];
 
     // Visit each cell, count its neighbors and determine its state in the next
     // generation. Then swap to the next_board
     for (y = 0; y < board->height; y++) {
         for (x = 0; x < board->width; x++) {
-            if (rule->neighbor_type == NEIGHBOR_MOORE) {
-                num_neighbors = board_count_moore_neighbors(board, x, y);
-            }
             index = y * board->width + x;
             current_cell = board_get_cell(board, x, y);
             changed = false;
             for (i = 0; i < rule->num_transitions; i++) {
+                num_neighbors = neighbor_count_func(board, x, y, 1);
                 if (current_cell == rule->transition_begin[i]) {
                     for (j = 0; j < rule->transition_sizes[i]; j++) {
                         if (num_neighbors == rule->transitions[i][j]) {
