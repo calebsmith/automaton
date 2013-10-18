@@ -56,4 +56,6 @@ void lens_move_left(Lens_t* lens);
 void lens_move_right(Lens_t* lens);
 void lens_move_up(Lens_t* lens);
 void lens_move_down(Lens_t* lens);
+void lens_zoom_in(Lens_t* lens);
+void lens_zoom_out(Lens_t* lens);
 #endif

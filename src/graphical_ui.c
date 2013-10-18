@@ -91,6 +91,12 @@ void GLFWCALL handle_keys(int key, int action)
         case GLFW_KEY_RIGHT:
             lens_move_right(&lens);
             break;
+        case 'I':
+            lens_zoom_in(&lens);
+            break;
+        case 'O':
+            lens_zoom_out(&lens);
+            break;
     }
 }
 
