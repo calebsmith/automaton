@@ -116,9 +116,9 @@ int main(int argc, char* argv[])
     }
 
     if (config.graphical) {
-        main_glfw(&board, &next_board, config.sleep_time * 1000, config.fullscreen);
+        main_glfw(&board, &next_board, &rule, config.sleep_time * 1000, config.fullscreen);
     } else {
-        main_curses(&board, &next_board, config.sleep_time * 1000);
+        main_curses(&board, &next_board, &rule, config.sleep_time * 1000);
     }
     board_destroy(&board);
     board_destroy(&next_board);

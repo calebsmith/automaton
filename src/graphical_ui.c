@@ -32,7 +32,7 @@ int init_glfw(bool fullscreen) {
 }
 
 
-int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen) {
+int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time, bool fullscreen) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
@@ -46,7 +46,7 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
             glfwPollEvents();
             render(board, &lens);
             if (playing) {
-                generate(next_board, board);
+                generate(next_board, board, rule);
                 wait(sleep_time, &last_time);
             }
         }

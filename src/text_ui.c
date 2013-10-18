@@ -21,7 +21,7 @@ WINDOW* init_curses(void)
 }
 
 
-void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sleep_time) {
+void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
@@ -61,7 +61,7 @@ void main_curses(Board_t* board, Board_t* next_board, unsigned long long int sle
         }
         if (playing) {
             display_curses(board, &lens, window);
-            generate(next_board, board);
+            generate(next_board, board, rule);
             wait(sleep_time, &last_time);
         }
     }

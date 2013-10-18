@@ -43,7 +43,7 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
  * Side-Effect: Overwrite next_board with data for the next generation and
  *     swap the boards
  */
-void generate(Board_t* next_board, Board_t* board)
+void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
 {
     int x, y;
     int index;
