@@ -3,6 +3,9 @@ Change log
 
 v0.0.6 (Unreleased)
 --------------------
+    * Removed hard coded Game of Life algorithm and replaced with a general
+        "rule" file to define the automata to use.
+    * Added some example data files for WireWorld automata.
     * Added interactive zooming to the lens feature.
 
 v0.0.5 (Oct 13 2013)
