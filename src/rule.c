@@ -1,123 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <ctype.h>
-
-#include "board.h"
-
-#define COLOR_STRING_LENGTH 6
-#define NEIGHBOR_STRING_LENGTH  20
-
-typedef enum {
-    NEIGHBOR_MOORE,
-    NEIGHBOR_VON_NEUMANN
-} Neighbor_t;
-
-
-typedef struct {
-    unsigned char red;
-    unsigned char blue;
-    unsigned char green;
-} Color_t;
-
-
-typedef struct {
-    unsigned short int num_states;
-    Neighbor_t neighbor_type;
-    unsigned short int state_chars[MAX_STATE];
-    Color_t state_colors[MAX_STATE];
-    int num_transitions;
-    unsigned char* transition_begin;
-    unsigned char* transition_end;
-    int* transition_sizes;
-    int** transitions;
-} Rule_t;
-
+#include "rule.h"
 
 /*
- * Reads a line of comma separated integers from a FILE stream
+ * Given a rule and a file stream, read and parse the rule file, applying the
+ * values to the rule structure. Must call rule_destroy with this rule when
+ * no longer in use.
  *
- * Parameters: FILE* file_stream, int* size, int* result
- * Return: Returns 1 for an invalid line; 0 for success
- * Side-Effect: Sets the results list of the values found to result, and the
- *     size of the results to the size provided
+ * Parameters: Rule_t* rule, FILE* file_stream
+ * Returns: 0 for success, otherwise returns an exit code for termination
+ * Side-Effects: Assign values to rule, allocating memory as needed.
  */
-int read_transition_line(FILE* file, int* size, int index, int** results_container)
-{
-    int current;
-    int integer_value = 0;
-    int* results;
-
-    *size = 0;
-    results = malloc(sizeof(int));
-    while(true) {
-        current = fgetc(file);
-        if (isdigit(current)) {
-            integer_value = integer_value * 10 + (current - '0');
-        } else if (current == ',' || current == '\n') {
-            results[*size] = integer_value;
-            integer_value = 0;
-            *size = *size + 1;
-            results = realloc(results, (*size + 1) * sizeof(int));
-            if (current == '\n') {
-                break;
-            }
-        } else {
-            *size = 0;
-            free(results);
-            return 1;
-        }
-    }
-    results_container[index] = results;
-    return 0;
-}
-
-void rule_display(Rule_t* rule) {
-    char state_color_display[12];
-    int i, j;
-
-    printf("num_states=%d\n", rule->num_states);
-    printf("neighbor_type=%d\n", rule->neighbor_type);
-    for (i = 0; i < rule->num_states; i++) {
-        sprintf(state_color_display, "%d:%d:%d",
-            rule->state_colors[i].red,
-            rule->state_colors[i].green,
-            rule->state_colors[i].blue
-        );
-        printf("state=%d state_char=%c state_color=%s\n",
-            i, rule->state_chars[i], state_color_display
-        );
-    }
-    printf("num_transitions=%d\n", rule->num_transitions);
-    for (i = 0; i < rule->num_transitions; i++) {
-        printf(
-            "transition %d is %d -> %d for:\n",
-            i, rule->transition_begin[i], rule->transition_end[i]
-        );
-        printf("size %d\n", rule->transition_sizes[i]);
-        for (j = 0; j < rule->transition_sizes[i]; j++) {
-            printf("%d ", rule->transitions[i][j]);
-        }
-        printf("\n");
-    }
-
-}
-
-
-void rule_destroy(Rule_t* rule)
-{
-    int i;
-
-    free(rule->transition_begin);
-    free(rule->transition_end);
-    free(rule->transition_sizes);
-    for (i = 0; i < rule->num_transitions; i++) {
-        free(rule->transitions[i]);
-    }
-    free(rule->transitions);
-}
-
 int rule_init(Rule_t* rule, FILE* infile) {
     int num_states;
     unsigned char state_char;
@@ -232,7 +123,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule->transition_begin[i] = state;
         rule->transition_end[i] = end_state;
         fseek(infile, 1, SEEK_CUR);
-        if (read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
+        if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
             printf("Bad transition line in transition %d\n", i);
             return 1;
         }
@@ -240,19 +131,98 @@ int rule_init(Rule_t* rule, FILE* infile) {
     return 0;
 }
 
-int main(void) {
-    Rule_t rule;
-    FILE *infile;
+/*
+ * Reads a line of comma separated integers from a FILE stream
+ *
+ * Parameters: FILE* file_stream, int* size, int* result
+ * Return: Returns 1 for an invalid line; 0 for success
+ * Side-Effect: Sets the results list of the values found to result, and the
+ *     size of the results to the size provided
+ */
+int _read_transition_line(FILE* file, int* size, int index, int** results_container)
+{
+    int current;
+    int integer_value = 0;
+    int* results;
 
-    if ((infile = fopen("data/rules/life.rule", "r")) == NULL) {
-        printf("Could not open rule file\n");
-        exit(1);
-    } else {
-        if(!rule_init(&rule, infile)) {
-            rule_display(&rule);
+    *size = 0;
+    results = malloc(sizeof(int));
+    while(true) {
+        current = fgetc(file);
+        if (isdigit(current)) {
+            integer_value = integer_value * 10 + (current - '0');
+        } else if (current == ',' || current == '\n') {
+            results[*size] = integer_value;
+            integer_value = 0;
+            *size = *size + 1;
+            results = realloc(results, (*size + 1) * sizeof(int));
+            if (current == '\n') {
+                break;
+            }
+        } else {
+            *size = 0;
+            free(results);
+            return 1;
         }
-        fclose(infile);
     }
-    rule_destroy(&rule);
+    results_container[index] = results;
     return 0;
 }
+
+/*
+ * Given a rule, deallocate all dynamically allocated members. Must be called
+ * after a rule is no longer needed, and only once
+ *
+ * Parameters: Rule_t* rule
+ * Side-Effects: Deallocates all rule members
+ */
+void rule_destroy(Rule_t* rule)
+{
+    int i;
+
+    free(rule->transition_begin);
+    free(rule->transition_end);
+    free(rule->transition_sizes);
+    for (i = 0; i < rule->num_transitions; i++) {
+        free(rule->transitions[i]);
+    }
+    free(rule->transitions);
+}
+
+/*
+ * Given a rule, prints its values for debugging
+ *
+ * Parameters: Rule_t* rule
+ */
+#ifdef DEBUG
+void rule_display(Rule_t* rule) {
+    char state_color_display[12];
+    int i, j;
+
+    printf("num_states=%d\n", rule->num_states);
+    printf("neighbor_type=%d\n", rule->neighbor_type);
+    for (i = 0; i < rule->num_states; i++) {
+        sprintf(state_color_display, "%d:%d:%d",
+            rule->state_colors[i].red,
+            rule->state_colors[i].green,
+            rule->state_colors[i].blue
+        );
+        printf("state=%d state_char=%c state_color=%s\n",
+            i, rule->state_chars[i], state_color_display
+        );
+    }
+    printf("num_transitions=%d\n", rule->num_transitions);
+    for (i = 0; i < rule->num_transitions; i++) {
+        printf(
+            "transition %d is %d -> %d for:\n",
+            i, rule->transition_begin[i], rule->transition_end[i]
+        );
+        printf("size %d\n", rule->transition_sizes[i]);
+        for (j = 0; j < rule->transition_sizes[i]; j++) {
+            printf("%d ", rule->transitions[i][j]);
+        }
+        printf("\n");
+    }
+
+}
+#endif
