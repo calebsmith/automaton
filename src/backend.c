@@ -53,6 +53,7 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
     int index;
     int num_neighbors;
     int current_cell;
+    int transition_size;
     int i, j;
     bool changed;
     NeighborFunction_t neighbor_count_func;
@@ -71,12 +72,18 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
                     board, x, y, rule->transition_neighbor_state[i]
                 );
                 if (current_cell == rule->transition_begin[i]) {
-                    for (j = 0; j < rule->transition_sizes[i]; j++) {
-                        if (num_neighbors == rule->transitions[i][j]) {
-                            next_board->cells[index] = rule->transition_end[i];
-                            changed = true;
-                            break;
+                    transition_size = rule->transition_sizes[i];
+                    if (transition_size > 0) {
+                        for (j = 0; j < transition_size; j++) {
+                            if (num_neighbors == rule->transitions[i][j]) {
+                                next_board->cells[index] = rule->transition_end[i];
+                                changed = true;
+                                break;
+                            }
                         }
+                    } else {
+                        next_board->cells[index] = rule->transition_end[i];
+                        changed = true;
                     }
                 }
             }

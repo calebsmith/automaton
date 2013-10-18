@@ -18,7 +18,8 @@ int rule_init(Rule_t* rule, FILE* infile) {
     int num_transitions;
     unsigned short int state;
     unsigned short int end_state;
-    unsigned short int neighbor_state;
+    int  neighbor_state;
+    char line_buffer[80];
     int i, j;
 
     // Read number of states
@@ -107,11 +108,19 @@ int rule_init(Rule_t* rule, FILE* infile) {
     rule->num_transitions = num_transitions;
     rule->transition_begin = malloc(num_transitions * sizeof(unsigned char));
     rule->transition_end = malloc(num_transitions * sizeof(unsigned char));
-    rule->transition_neighbor_state = malloc(num_transitions * sizeof(unsigned char));
+    rule->transition_neighbor_state = malloc(num_transitions * sizeof(int));
     rule->transition_sizes = malloc(num_transitions * sizeof(int));
     rule->transitions = malloc(num_transitions * sizeof(int*));
+
     for (i = 0; i < num_transitions; i++) {
-        if (fscanf(infile, "%hd->%hd:%hd", &state, &end_state, &neighbor_state) == 3) {
+        if (fscanf(infile, "%s", line_buffer) == 1) {
+        } else {
+            fprintf(stderr, "buffer is: %s\n", line_buffer);
+            printf("Bad transition mapping in rule file on transition %d\n", i);
+            return 1;
+        }
+        fprintf(stderr, "buffer is: %s\n", line_buffer);
+        if (sscanf(line_buffer, "%hd->%hd:%d", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states) ||
                 (neighbor_state < 0 || neighbor_state > num_states)) {
@@ -121,18 +130,32 @@ int rule_init(Rule_t* rule, FILE* infile) {
                 );
                 return 1;
             }
+        } else if (sscanf(line_buffer, "%hd->%hd", &state, &end_state) == 2) {
+            if ((state < 0 || state > num_states) ||
+                (end_state < 0 || end_state > num_states)) {
+                printf(
+                    "state numbers %d or %d are out of bounds in transition portion rule file\n",
+                    state, end_state
+                );
+                return 1;
+            }
+            neighbor_state = -1;
         } else {
-            printf("Bad transition mapping in rule file on transition %d\n", i);
-            printf("Example of format: 0->1\n");
+            printf("Bad transition mapping in rule file on transition %d with line %s\n", i, line_buffer);
+            printf("Example of format: 0->1 or 0->1:1\n");
             return 1;
         }
         rule->transition_begin[i] = state;
         rule->transition_end[i] = end_state;
         rule->transition_neighbor_state[i] = neighbor_state;
-        fseek(infile, 1, SEEK_CUR);
-        if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
-            printf("Bad transition line in transition %d\n", i);
-            return 1;
+        if (neighbor_state != -1) {
+            fseek(infile, 1, SEEK_CUR);
+            if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
+                printf("Bad transition line in transition %d\n", i);
+                return 1;
+            }
+        } else {
+            rule->transition_sizes[i] = 0;
         }
     }
     return 0;
