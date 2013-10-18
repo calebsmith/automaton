@@ -1,1 +1,1 @@
-./gameoflife -g -t data/xor.dat -s 400000
+./gameoflife -g -t data/xor.dat -s 200000
