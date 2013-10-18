@@ -20,9 +20,17 @@ void board_init(Board_t* board, FILE* infile, int toroidal)
     int x = 0, y = 0;
     int width, height;
     int cell_state = 0;
+    char rule_filename_path[RULE_FILENAME_LENGTH] = "rules/";
 
     // Load the width, height
     board->toroidal = toroidal;
+    if ((fscanf(infile, "%200s", board->rule_filename)) != 1) {
+        printf("Bad file format\n");
+        exit(EXIT_STATUS_BAD_FILE);
+    }
+    strncat(rule_filename_path, board->rule_filename, RULE_FILENAME_LENGTH - 6);
+    strncat(rule_filename_path, ".rule", 5);
+    strncpy(board->rule_filename, rule_filename_path, RULE_FILENAME_LENGTH);
     if ((fscanf(infile, "%d,%d", &width, &height)) != 2) {
         printf("Bad file format\n");
         exit(EXIT_STATUS_BAD_FILE);

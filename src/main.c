@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string.h>
 
 #include "board.h"
+#include "rule.h"
 #include "backend.h"
 #include "text_ui.h"
 #include "graphical_ui.h"
@@ -91,6 +92,7 @@ int main(int argc, char* argv[])
 
     // Create a game board, and a next board
     Board_t board, next_board;
+    Rule_t rule;
     FILE *infile;
 
     if ((infile = fopen(config.filename, "r")) == NULL) {
@@ -101,6 +103,17 @@ int main(int argc, char* argv[])
         fclose(infile);
     }
     board_copy(&next_board, &board);
+    // Load rule file
+    if ((infile = fopen(board.rule_filename, "r")) == NULL) {
+        printf("Could not open rule file\n");
+        exit(1);
+    } else {
+        if (rule_init(&rule, infile)) {
+            printf("Failed to load rule file\n");
+            exit(1);
+        }
+        fclose(infile);
+    }
 
     if (config.graphical) {
         main_glfw(&board, &next_board, config.sleep_time * 1000, config.fullscreen);
@@ -109,6 +122,7 @@ int main(int argc, char* argv[])
     }
     board_destroy(&board);
     board_destroy(&next_board);
+    rule_destroy(&rule);
     return 0;
 }
 

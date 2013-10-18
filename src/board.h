@@ -18,9 +18,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BOARD_BORDER_SIZE 30
 #define EXIT_STATUS_BAD_FILE 3
+#define RULE_FILENAME_LENGTH 200
 
 #define MAX_STATE 255
 #define MIN_WIDTH 5
@@ -36,6 +38,7 @@ typedef struct {
     int min_x, min_y;
     int max_x, max_y;
     unsigned char *cells;
+    char rule_filename[RULE_FILENAME_LENGTH];
 } Board_t;
 
 void board_init(Board_t* board, FILE* infile, int toroidal);
