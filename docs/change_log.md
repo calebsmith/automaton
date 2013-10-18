@@ -1,7 +1,7 @@
 Change log
 ==========
 
-v0.0.6 (Unreleased)
+v0.0.6 (Oct 18 2013)
 --------------------
     * Removed hard coded Game of Life algorithm and replaced with a general
         "rule" file to define the automata to use.
