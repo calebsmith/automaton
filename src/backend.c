@@ -1,5 +1,10 @@
 #include "backend.h"
 
+NeighborFunction_t NEIGHBOR_FUNC_LOOKUP[] = {
+    [NEIGHBOR_MOORE]=&board_count_moore_neighbors,
+    [NEIGHBOR_VON_NEUMANN]=&board_count_von_neumann_neighbors
+};
+
 /*
  * Wait for <sleep_time> adjusted by the difference of the current
  * time and the finishing time of the last loop execution.
@@ -35,48 +40,90 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
 
 /*
  * Determines the next board based on the cells of the current one, then
- * swaps them to move to the next generation. Follows Conway's Game of Life
- * rules: B3/S23
+ * swaps them to move to the next generation.
  *
  * Parameters: Board_t* next_board, Board_t* board
  * Return: void
  * Side-Effect: Overwrite next_board with data for the next generation and
  *     swap the boards
  */
-void generate(Board_t* next_board, Board_t* board)
+void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
 {
     int x, y;
-    int index;
-    int num_neighbors;
-    int current_cell;
+    NeighborFunction_t neighbor_count_func;
 
-    // Visit each cell, count its neighbors and determine its living/dead
-    // status in the next generation. Then apply to the next_board
-    for(y = 0; y < board->height; y++) {
-        for(x = 0; x < board->width; x++) {
-            num_neighbors = board_count_moore_neighbors(board, x, y);
-            index = y * board->width + x;
-            current_cell = board_get_cell(board, x, y);
-            if (current_cell) {
-                if (num_neighbors == 2 || num_neighbors == 3) {
-                    // survival
-                    next_board->cells[index] = LIVE;
-                } else {
-                    // overcrowding or underpopulation
-                    next_board->cells[index] = DEAD;
-                }
-            } else {
-                if (num_neighbors == 3) {
-                    // reproduction
-                    next_board->cells[index] = LIVE;
-                } else {
-                    // remain dead
-                    next_board->cells[index] = DEAD;
-                }
-            }
+    // Determine the neighbor counting function to be used based on the
+    // neighbor type set in the rule (e.g. Moore neighbors)
+    neighbor_count_func = NEIGHBOR_FUNC_LOOKUP[rule->neighbor_type];
+
+    // Visit each cell, count its neighbors and determine its state in the next
+    // generation. Then swap to the next_board
+    for (y = 0; y < board->height; y++) {
+        for (x = 0; x < board->width; x++) {
+            handle_transition_rule(
+                board, next_board, rule, neighbor_count_func, x, y
+            );
         }
     }
     // swap boards
     board_swap(board, next_board);
 }
 
+/*
+ * Determines the next state of a cell at x, y in the given `board` and applies
+ * it to `next_board` according to the given `rule`.
+ */
+void handle_transition_rule(
+    Board_t* board, Board_t* next_board, Rule_t* rule, NeighborFunction_t neighbor_count_func,
+    int x, int y)
+{
+    int num_neighbors;
+    int transition_size;
+    int index;
+    unsigned char current_cell;
+    int i, j;
+    bool changed = false;
+
+    index = y * board->width + x;
+    current_cell = board_get_cell(board, x, y);
+    // Go through each transition rule
+    for (i = 0; i < rule->num_transitions; i++) {
+        if (current_cell == rule->transition_begin[i]) {
+            transition_size = rule->transition_sizes[i];
+            // If the rule involves neighbor counting
+            if (transition_size > 0) {
+                num_neighbors = neighbor_count_func(
+                    board, x, y, rule->transition_neighbor_state[i]
+                );
+                for (j = 0; j < transition_size; j++) {
+                    // Apply transition if count of neighbors matches
+                    // any in the list
+                    if (!rule->transition_negator[i]) {
+                        if (num_neighbors == rule->transitions[i][j]) {
+                            next_board->cells[index] = rule->transition_end[i];
+                            changed = true;
+                            break;
+                        }
+                    } else {
+                        // Make the transition *unless* the right
+                        // number of neighbors are present
+                        changed = true;
+                        next_board->cells[index] = rule->transition_end[i];
+                        if (num_neighbors == rule->transitions[i][j]) {
+                            next_board->cells[index] = current_cell;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                // Rule should occur regardless of neighbors
+                next_board->cells[index] = rule->transition_end[i];
+                changed = true;
+            }
+        }
+    }
+    // The cell is unchanged so far, just copy the old value
+    if (!changed) {
+        next_board->cells[index] = current_cell;
+    }
+}

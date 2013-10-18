@@ -32,7 +32,7 @@ int init_glfw(bool fullscreen) {
 }
 
 
-int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_time, bool fullscreen) {
+int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time, bool fullscreen) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
@@ -44,9 +44,9 @@ int main_glfw(Board_t* board, Board_t* next_board, unsigned long long int sleep_
     if (!init_glfw(fullscreen)) {
         while (running) {
             glfwPollEvents();
-            render(board, &lens);
+            render(board, &lens, rule);
             if (playing) {
-                generate(next_board, board);
+                generate(next_board, board, rule);
                 wait(sleep_time, &last_time);
             }
         }
@@ -107,7 +107,7 @@ int GLFWCALL handle_window_close(void)
     return GL_FALSE;
 }
 
-void render(Board_t* board, Lens_t* lens) {
+void render(Board_t* board, Lens_t* lens, const Rule_t* rule) {
     float x, y;
     int display_x, display_y;
     int value;
@@ -122,7 +122,10 @@ void render(Board_t* board, Lens_t* lens) {
             display_x = x - lens->x_display_offset;
             display_y = y - lens->y_display_offset;
             if (value != 0) {
-                make_quad(display_x, display_y, lens->scale);
+                make_quad(
+                    display_x, display_y, lens->scale,
+                    &rule->state_colors[value]
+                );
             }
         }
     }
@@ -130,9 +133,8 @@ void render(Board_t* board, Lens_t* lens) {
     glfwSwapBuffers();
 }
 
-inline void make_quad(float x, float y, float size) {
-    // To change color uncomment
-    // glColor3f(255.0f, 0.0f, 255.0f);
+inline void make_quad(float x, float y, float size, const Color_t* color) {
+    glColor3ub(color->red, color->green, color->blue);
     //top-left vertex (corner)
     glTexCoord2i(0, 0);
     glVertex3f(x * size, y * size, 0.0f);
