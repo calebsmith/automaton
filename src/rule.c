@@ -19,6 +19,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
     unsigned short int state;
     unsigned short int end_state;
     int  neighbor_state;
+    bool neighbor_negator;
     char line_buffer[80];
     int i, j;
 
@@ -109,6 +110,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
     rule->transition_begin = malloc(num_transitions * sizeof(unsigned char));
     rule->transition_end = malloc(num_transitions * sizeof(unsigned char));
     rule->transition_neighbor_state = malloc(num_transitions * sizeof(int));
+    rule->transition_negator = malloc(num_transitions * sizeof(bool));
     rule->transition_sizes = malloc(num_transitions * sizeof(int));
     rule->transitions = malloc(num_transitions * sizeof(int*));
 
@@ -119,6 +121,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
             printf("Bad transition mapping in rule file on transition %d\n", i);
             return 1;
         }
+        neighbor_negator = false;
         if (sscanf(line_buffer, "%hd->%hd:%d", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states) ||
@@ -129,6 +132,17 @@ int rule_init(Rule_t* rule, FILE* infile) {
                 );
                 return 1;
             }
+        } else if (sscanf(line_buffer, "%hd->%hd:~%d", &state, &end_state, &neighbor_state) == 3) {
+            if ((state < 0 || state > num_states) ||
+                (end_state < 0 || end_state > num_states) ||
+                (neighbor_state < 0 || neighbor_state > num_states)) {
+                printf(
+                    "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
+                    state, end_state, neighbor_state
+                );
+                return 1;
+            }
+            neighbor_negator = true;
         } else if (sscanf(line_buffer, "%hd->%hd", &state, &end_state) == 2) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states)) {
@@ -147,6 +161,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule->transition_begin[i] = state;
         rule->transition_end[i] = end_state;
         rule->transition_neighbor_state[i] = neighbor_state;
+        rule->transition_negator[i] = neighbor_negator;
         if (neighbor_state != -1) {
             fseek(infile, 1, SEEK_CUR);
             if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
@@ -212,6 +227,7 @@ void rule_destroy(Rule_t* rule)
     free(rule->transition_begin);
     free(rule->transition_end);
     free(rule->transition_neighbor_state);
+    free(rule->transition_negator);
     free(rule->transition_sizes);
     for (i = 0; i < rule->num_transitions; i++) {
         free(rule->transitions[i]);

@@ -75,10 +75,21 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
                             board, x, y, rule->transition_neighbor_state[i]
                         );
                         for (j = 0; j < transition_size; j++) {
-                            if (num_neighbors == rule->transitions[i][j]) {
-                                next_board->cells[index] = rule->transition_end[i];
+                            if (!rule->transition_negator[i]) {
+                                if (num_neighbors == rule->transitions[i][j]) {
+                                    next_board->cells[index] = rule->transition_end[i];
+                                    changed = true;
+                                    break;
+                                }
+                            } else {
+                                // Make the transition *unless* the right
+                                // number of neighbors are present
                                 changed = true;
-                                break;
+                                next_board->cells[index] = rule->transition_end[i];
+                                if (num_neighbors == rule->transitions[i][j]) {
+                                    next_board->cells[index] = current_cell;
+                                    break;
+                                }
                             }
                         }
                     } else {
