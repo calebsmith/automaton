@@ -60,7 +60,7 @@ void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned lon
             lens_move_right(&lens);
         }
         if (playing) {
-            display_curses(board, &lens, window);
+            display_curses(board, &lens, rule, window);
             generate(next_board, board, rule);
             wait(sleep_time, &last_time);
         }
@@ -73,15 +73,17 @@ void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned lon
 /*
  * Displays the current board in a curses window
  *
- * Parameters: Board_t* board, WINDOW* display_area
+ * Parameters: Board_t* board, Lens_t* lens, const Rule_t* rule,
+ *     WINDOW* display_area
  * Return: void
  */
-void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window)
+void display_curses(const Board_t* board, Lens_t* lens, const Rule_t* rule, WINDOW* window)
 {
     int x, y;
     int display_x, display_y;
     int display_width, display_height;
     int value;
+    char display_value;
 
     // determine terminal's rows and columns. Display cell if in bounds
     getmaxyx(window, display_height, display_width);
@@ -97,8 +99,9 @@ void display_curses(const Board_t* board, Lens_t* lens, WINDOW* window)
             move(display_y, display_x);
             // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {
-                if (value != 0) {
-                    insch('o');
+                display_value = rule->state_chars[value];
+                if (display_value != ' ') {
+                    insch(display_value);
                 }
             }
         }
