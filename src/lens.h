@@ -32,6 +32,7 @@ typedef struct {
     // Amount to displace the display coordinates x,y from the x,y of board
     int x_display_offset, y_display_offset;
     int scale;              // size of each cell in pixels/characters
+    int min_scale;          // minimum allowed value of scale
 
 } Lens_t;
 
@@ -55,4 +56,6 @@ void lens_move_left(Lens_t* lens);
 void lens_move_right(Lens_t* lens);
 void lens_move_up(Lens_t* lens);
 void lens_move_down(Lens_t* lens);
+void lens_zoom_in(Lens_t* lens);
+void lens_zoom_out(Lens_t* lens);
 #endif

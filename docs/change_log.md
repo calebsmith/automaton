@@ -1,7 +1,7 @@
 Change log
 ==========
 
-v0.0.5 (Unreleased)
+v0.0.5 (Oct 13 2013)
 -------------------
     * Added a "lens" to handle the display of the board. Allows for boards
         larger than the display surface, and handles logic for zooming,
@@ -38,3 +38,4 @@ v0.0.2
 v0.0.1
 ------
     * Initial public release
+
