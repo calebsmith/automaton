@@ -18,6 +18,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
     int num_transitions;
     unsigned short int state;
     unsigned short int end_state;
+    unsigned short int neighbor_state;
     int i, j;
 
     // Read number of states
@@ -106,15 +107,17 @@ int rule_init(Rule_t* rule, FILE* infile) {
     rule->num_transitions = num_transitions;
     rule->transition_begin = malloc(num_transitions * sizeof(unsigned char));
     rule->transition_end = malloc(num_transitions * sizeof(unsigned char));
+    rule->transition_neighbor_state = malloc(num_transitions * sizeof(unsigned char));
     rule->transition_sizes = malloc(num_transitions * sizeof(int));
     rule->transitions = malloc(num_transitions * sizeof(int*));
     for (i = 0; i < num_transitions; i++) {
-        if (fscanf(infile, "%hd->%hd", &state, &end_state) == 2) {
+        if (fscanf(infile, "%hd->%hd:%hd", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
-                (end_state < 0 || end_state > num_states)) {
+                (end_state < 0 || end_state > num_states) ||
+                (neighbor_state < 0 || neighbor_state > num_states)) {
                 printf(
-                    "state number %d is out of bounds in transition portion rule file\n",
-                    state
+                    "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
+                    state, end_state, neighbor_state
                 );
                 return 1;
             }
@@ -125,6 +128,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
         }
         rule->transition_begin[i] = state;
         rule->transition_end[i] = end_state;
+        rule->transition_neighbor_state[i] = neighbor_state;
         fseek(infile, 1, SEEK_CUR);
         if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
             printf("Bad transition line in transition %d\n", i);
@@ -185,6 +189,7 @@ void rule_destroy(Rule_t* rule)
 
     free(rule->transition_begin);
     free(rule->transition_end);
+    free(rule->transition_neighbor_state);
     free(rule->transition_sizes);
     for (i = 0; i < rule->num_transitions; i++) {
         free(rule->transitions[i]);
@@ -217,8 +222,9 @@ void rule_display(Rule_t* rule) {
     printf("num_transitions=%d\n", rule->num_transitions);
     for (i = 0; i < rule->num_transitions; i++) {
         printf(
-            "transition %d is %d -> %d for:\n",
-            i, rule->transition_begin[i], rule->transition_end[i]
+            "transition %d is %d -> %d checking state %d for:\n",
+            i, rule->transition_begin[i], rule->transition_end[i],
+            rule->transition_neighbor_state[i]
         );
         printf("size %d\n", rule->transition_sizes[i]);
         for (j = 0; j < rule->transition_sizes[i]; j++) {

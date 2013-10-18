@@ -169,16 +169,16 @@ int board_get_cell(const Board_t* board, int x, int y)
  */
 int board_count_moore_neighbors(const Board_t* board, int x, int y, unsigned char state)
 {
-    return (
-        board_get_cell(board, x - 1, y - 1) +
-        board_get_cell(board, x, y - 1) +
-        board_get_cell(board, x + 1, y - 1) +
-        board_get_cell(board, x - 1, y) +
-        board_get_cell(board, x + 1, y) +
-        board_get_cell(board, x - 1, y + 1) +
-        board_get_cell(board, x, y + 1) +
-        board_get_cell(board, x + 1, y + 1)
-    );
+    int result = 0;
+    if (board_get_cell(board, x - 1, y - 1) == state) result++;
+    if (board_get_cell(board, x, y - 1) == state) result++;
+    if (board_get_cell(board, x + 1, y - 1) == state) result++;
+    if (board_get_cell(board, x - 1, y) == state) result++;
+    if (board_get_cell(board, x + 1, y) == state) result++;
+    if (board_get_cell(board, x - 1, y + 1) == state) result++;
+    if (board_get_cell(board, x, y + 1) == state) result++;
+    if (board_get_cell(board, x + 1, y + 1) == state) result++;
+    return result;
 }
 
 /*
@@ -191,12 +191,12 @@ int board_count_moore_neighbors(const Board_t* board, int x, int y, unsigned cha
  */
 int board_count_von_neumann_neighbors(const Board_t* board, int x, int y, unsigned char state)
 {
-    return (
-        board_get_cell(board, x, y - 1) +
-        board_get_cell(board, x - 1, y) +
-        board_get_cell(board, x + 1, y) +
-        board_get_cell(board, x, y + 1)
-    );
+    int result = 0;
+    if (board_get_cell(board, x, y - 1) == state) result++;
+    if (board_get_cell(board, x - 1, y) == state) result++;
+    if (board_get_cell(board, x + 1, y) == state) result++;
+    if (board_get_cell(board, x, y + 1) == state) result++;
+    return result;
 }
 
 /*

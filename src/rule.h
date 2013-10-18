@@ -33,6 +33,7 @@ typedef struct {
     int num_transitions;
     unsigned char* transition_begin;
     unsigned char* transition_end;
+    unsigned char* transition_neighbor_state;
     int* transition_sizes;
     int** transitions;
 } Rule_t;

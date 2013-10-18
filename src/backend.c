@@ -67,7 +67,9 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
             current_cell = board_get_cell(board, x, y);
             changed = false;
             for (i = 0; i < rule->num_transitions; i++) {
-                num_neighbors = neighbor_count_func(board, x, y, 1);
+                num_neighbors = neighbor_count_func(
+                    board, x, y, rule->transition_neighbor_state[i]
+                );
                 if (current_cell == rule->transition_begin[i]) {
                     for (j = 0; j < rule->transition_sizes[i]; j++) {
                         if (num_neighbors == rule->transitions[i][j]) {
