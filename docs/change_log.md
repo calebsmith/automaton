@@ -1,8 +1,15 @@
 Change log
 ==========
 
+v0.0.6 (Oct 18 2013)
+--------------------
+    * Removed hard coded Game of Life algorithm and replaced with a general
+        "rule" file to define the automata to use.
+    * Added some example data files for WireWorld automata.
+    * Added interactive zooming to the lens feature.
+
 v0.0.5 (Oct 13 2013)
--------------------
+--------------------
     * Added a "lens" to handle the display of the board. Allows for boards
         larger than the display surface, and handles logic for zooming,
         navigation, centering and so on.
@@ -38,3 +45,4 @@ v0.0.2
 v0.0.1
 ------
     * Initial public release
+

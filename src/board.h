@@ -18,9 +18,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BOARD_BORDER_SIZE 30
 #define EXIT_STATUS_BAD_FILE 3
+#define RULE_FILENAME_LENGTH 200
 
 #define MAX_STATE 255
 #define MIN_WIDTH 5
@@ -36,12 +38,16 @@ typedef struct {
     int min_x, min_y;
     int max_x, max_y;
     unsigned char *cells;
+    char rule_filename[RULE_FILENAME_LENGTH];
 } Board_t;
+
+typedef int (*NeighborFunction_t) (const Board_t*, int, int, unsigned char);
 
 void board_init(Board_t* board, FILE* infile, int toroidal);
 void board_copy(Board_t* board_a, const Board_t* board_b);
 void board_swap(Board_t* board_a, Board_t* board_b);
 int board_get_cell(const Board_t* board, int x, int y);
-int board_count_moore_neighbors(const Board_t* board, int x, int y);
+int board_count_moore_neighbors(const Board_t* board, int x, int y, unsigned char state);
+int board_count_von_neumann_neighbors(const Board_t* board, int x, int y, unsigned char state);
 void board_destroy(Board_t* board);
 #endif

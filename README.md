@@ -1,7 +1,8 @@
 gameoflife
 ==========
 
-A simple implementation of Conway's Game of Life in C
+A simple cellular automata simulation runner in C
+(such as Conway's Game of Life)
 ![gameoflife](http://i.imgur.com/B0ElyTn.png)
 
 Notes
@@ -91,6 +92,8 @@ During program execution, the following keys have the corresponding effects:
 * j / down-arrow - move view down
 * k / up-arrow - move view up
 * l / right-arrow - move view right
+* i - zoom in
+* o - zoom out
 
 
 Seed data files
@@ -98,6 +101,7 @@ Seed data files
 The data files that provide an initial state of the board have the following
 format
 
+    rule_filename
     width,height
     state:x,y
     state:x,y
@@ -106,12 +110,14 @@ format
 
 The following is an example data file
 
+    life
     8,8
     1:4,4
     1:3,4
     1:3,3
 
-Would have the general appearance of:
+Would use the rules/life.rule rule file (for Game of Life) and have the general
+starting appearance of:
 
     00000000
     00000000
@@ -124,6 +130,7 @@ Would have the general appearance of:
 
 See data/gosper_gun.dat for a more practical example
 
+See data/diode.dat for a barebones example of WireWorld automata
 
 Authors
 -------
