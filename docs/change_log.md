@@ -1,8 +1,12 @@
 Change log
 ==========
 
+v0.0.6 (Unreleased)
+--------------------
+    * Added interactive zooming to the lens feature.
+
 v0.0.5 (Oct 13 2013)
--------------------
+--------------------
     * Added a "lens" to handle the display of the board. Allows for boards
         larger than the display surface, and handles logic for zooming,
         navigation, centering and so on.
@@ -38,3 +42,4 @@ v0.0.2
 v0.0.1
 ------
     * Initial public release
+

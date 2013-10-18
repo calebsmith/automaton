@@ -38,6 +38,7 @@ void lens_init(Lens_t* lens, const Board_t* board, int width, int height, bool s
     if (lens->scale == 0) {
         lens->scale = 1;
     }
+    lens->min_scale = lens->scale;
 }
 
 /*
@@ -59,18 +60,49 @@ void lens_set_offset_bounds(Lens_t* lens, const Board_t* board, int width, int h
     diff_lens_x = (diff_board_x < width) ? diff_board_x: width;
     diff_lens_y = (diff_board_y < height) ? diff_board_y: height;
 
-    // Assure x,y offsets are within bounds
-    if (lens->x_offset + board->min_x + diff_lens_x > board->max_x) {
-        lens->x_offset = board->max_x - diff_lens_x - board->min_x;
+    int board_middle_x = (diff_board_x / 2) + board->min_x;
+    int board_middle_y = (diff_board_y / 2) + board->min_y;
+    int visible_offset_x = (width / lens->scale) / 2 + 1;
+    int visible_offset_y = (height / lens->scale) / 2 + 1;
+
+    int left_edge = board_middle_x - visible_offset_x + lens->x_offset;
+    int right_edge = board_middle_x + visible_offset_x + lens->x_offset;
+    int top_edge = board_middle_y - visible_offset_y + lens->y_offset;
+    int bottom_edge = board_middle_y + visible_offset_y + lens->y_offset;
+
+    if (right_edge >= board->max_x && left_edge <= board->min_x) {
+        // limit x offset if width of board fits in view
+        if (lens->x_offset + board->min_x + diff_lens_x > board->max_x) {
+            lens->x_offset = board->max_x - diff_lens_x - board->min_x;
+        }
+        if (lens->x_offset < 0) {
+            lens->x_offset = 0;
+        }
+    } else {
+        // limit x offset to edges if board does not fit in view
+        if (right_edge > board->max_x) {
+            lens->x_offset = board->max_x - visible_offset_x - board_middle_x;
+        }
+        if (left_edge < board->min_x) {
+            lens->x_offset = board->min_x + visible_offset_x - board_middle_x;
+        }
     }
-    if (lens->x_offset < 0) {
-        lens->x_offset = 0;
-    }
-    if (lens->y_offset + board->min_y + diff_lens_y > board->max_y) {
-        lens->y_offset = board->max_y - diff_lens_y - board->min_y;
-    }
-    if (lens->y_offset < 0) {
-        lens->y_offset = 0;
+    if (bottom_edge >= board->max_y && top_edge <= board->min_y) {
+        // limit y offset if width of board fits in view
+        if (lens->y_offset + board->min_y + diff_lens_y > board->max_y) {
+            lens->y_offset = board->max_y - diff_lens_y - board->min_y;
+        }
+        if (lens->y_offset < 0) {
+            lens->y_offset = 0;
+        }
+    } else {
+        // limit y offset to edges if board does not fit in view
+        if (bottom_edge > board->max_y) {
+            lens->y_offset = board->max_y - visible_offset_y - board_middle_y;
+        }
+        if (top_edge < board->min_y) {
+            lens->y_offset = board->min_y + visible_offset_y - board_middle_y;
+        }
     }
 }
 
@@ -187,4 +219,18 @@ void lens_move_up(Lens_t* lens)
 void lens_move_down(Lens_t* lens)
 {
     lens_move(lens, DOWN);
+}
+
+void lens_zoom_in(Lens_t* lens)
+{
+    if (lens->scale < 20) {
+        lens->scale++;
+    }
+}
+
+void lens_zoom_out(Lens_t* lens)
+{
+    if (lens->scale > lens->min_scale) {
+        lens->scale--;
+    }
 }
