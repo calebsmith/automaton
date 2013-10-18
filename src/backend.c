@@ -49,30 +49,32 @@ void generate(Board_t* next_board, Board_t* board, Rule_t* rule)
     int index;
     int num_neighbors;
     int current_cell;
+    int i, j;
+    bool changed;
 
-    // Visit each cell, count its neighbors and determine its living/dead
-    // status in the next generation. Then apply to the next_board
-    for(y = 0; y < board->height; y++) {
-        for(x = 0; x < board->width; x++) {
-            num_neighbors = board_count_moore_neighbors(board, x, y);
+    // Visit each cell, count its neighbors and determine its state in the next
+    // generation. Then swap to the next_board
+    for (y = 0; y < board->height; y++) {
+        for (x = 0; x < board->width; x++) {
+            if (rule->neighbor_type == NEIGHBOR_MOORE) {
+                num_neighbors = board_count_moore_neighbors(board, x, y);
+            }
             index = y * board->width + x;
             current_cell = board_get_cell(board, x, y);
-            if (current_cell) {
-                if (num_neighbors == 2 || num_neighbors == 3) {
-                    // survival
-                    next_board->cells[index] = LIVE;
-                } else {
-                    // overcrowding or underpopulation
-                    next_board->cells[index] = DEAD;
+            changed = false;
+            for (i = 0; i < rule->num_transitions; i++) {
+                if (current_cell == rule->transition_begin[i]) {
+                    for (j = 0; j < rule->transition_sizes[i]; j++) {
+                        if (num_neighbors == rule->transitions[i][j]) {
+                            next_board->cells[index] = rule->transition_end[i];
+                            changed = true;
+                            break;
+                        }
+                    }
                 }
-            } else {
-                if (num_neighbors == 3) {
-                    // reproduction
-                    next_board->cells[index] = LIVE;
-                } else {
-                    // remain dead
-                    next_board->cells[index] = DEAD;
-                }
+            }
+            if (!changed) {
+                next_board->cells[index] = current_cell;
             }
         }
     }
