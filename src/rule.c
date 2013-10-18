@@ -105,6 +105,19 @@ void rule_display(Rule_t* rule) {
 }
 
 
+void rule_destroy(Rule_t* rule)
+{
+    int i;
+
+    free(rule->transition_begin);
+    free(rule->transition_end);
+    free(rule->transition_sizes);
+    for (i = 0; i < rule->num_transitions; i++) {
+        free(rule->transitions[i]);
+    }
+    free(rule->transitions);
+}
+
 int rule_init(Rule_t* rule, FILE* infile) {
     int num_states;
     unsigned char state_char;
@@ -209,17 +222,11 @@ int rule_init(Rule_t* rule, FILE* infile) {
                     "state number %d is out of bounds in transition portion rule file\n",
                     state
                 );
-                free(rule->transition_begin);
-                free(rule->transition_end);
-                free(rule->transition_sizes);
                 return 1;
             }
         } else {
             printf("Bad transition mapping in rule file on transition %d\n", i);
             printf("Example of format: 0->1\n");
-            free(rule->transition_begin);
-            free(rule->transition_end);
-            free(rule->transition_sizes);
             return 1;
         }
         rule->transition_begin[i] = state;
@@ -227,14 +234,9 @@ int rule_init(Rule_t* rule, FILE* infile) {
         fseek(infile, 1, SEEK_CUR);
         if (read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
             printf("Bad transition line in transition %d\n", i);
-            free(rule->transition_begin);
-            free(rule->transition_end);
-            free(rule->transition_sizes);
-            free(rule->transitions);
             return 1;
         }
     }
-    printf("end\n");
     return 0;
 }
 
@@ -246,9 +248,11 @@ int main(void) {
         printf("Could not open rule file\n");
         exit(1);
     } else {
-        rule_init(&rule, infile);
+        if(!rule_init(&rule, infile)) {
+            rule_display(&rule);
+        }
         fclose(infile);
     }
-    rule_display(&rule);
+    rule_destroy(&rule);
     return 0;
 }
