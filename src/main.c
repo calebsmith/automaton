@@ -31,6 +31,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define EXIT_STATUS_TOO_FEW_ARGUMENTS 1
 #define EXIT_STATUS_NO_FILE 2
 
+#define MAX_FILENAME 500
+
 
 const char* USAGE_STRING = ""
 "The command format is:\n"
@@ -77,7 +79,7 @@ typedef struct {
     int graphical;
     int toroidal;
     unsigned long long int sleep_time;
-    const char* filename;
+    char filename[MAX_FILENAME + 1];
 } Config_t;
 
 Config_t get_config(int argc, char* argv[]);
@@ -140,6 +142,7 @@ Config_t get_config(int argc, char* argv[])
     Config_t config;
     int i;
     char *arg;
+    bool filename_arg = false;
 
     config.fullscreen = false;
     config.help = false;
@@ -179,11 +182,12 @@ Config_t get_config(int argc, char* argv[])
             config.sleep_time = atoi(arg);
         } else {
             // handle filename argument
-            config.filename = arg;
+            strncpy(config.filename, arg, MAX_FILENAME);
+            filename_arg = true;
         }
     }
     // error handling
-    if (config.filename == NULL && config.help == false) {
+    if (!filename_arg && config.help == false) {
         printf("Must provide a filename to a data file\n");
         exit(EXIT_STATUS_TOO_FEW_ARGUMENTS);
     }
