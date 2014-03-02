@@ -162,6 +162,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule->transition_end[i] = end_state;
         rule->transition_neighbor_state[i] = neighbor_state;
         rule->transition_negator[i] = neighbor_negator;
+        rule->transitions[i] = malloc(sizeof(int));
         if (neighbor_state != -1) {
             fseek(infile, 1, SEEK_CUR);
             if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
