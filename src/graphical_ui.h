@@ -9,8 +9,7 @@
 
 #include <stdbool.h>
 
-#include <GL/glfw.h>
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include "board.h"
 #include "rule.h"
@@ -21,11 +20,12 @@
 #define WINDOW_HEIGHT 768
 #define GL_WINDOW_EXIT 4
 
-void GLFWCALL handle_keys(int key, int action);
-int GLFWCALL handle_window_close(void);
 int init_glfw(bool fullscreen);
 int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time, bool fullscreen);
 void render(Board_t* board, Lens_t* lens, const Rule_t* rule);
 void make_quad(float x, float y, float size, const Color_t* color);
+
+void handle_keys(GLFWwindow* window, int key, int scancode, int action, int mods);
+void handle_window_close(GLFWwindow* window);
 
 #endif

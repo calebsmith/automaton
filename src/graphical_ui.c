@@ -4,30 +4,32 @@
 bool running = true;
 bool playing = true;
 Lens_t lens;
+GLFWwindow* window;
 
 
 int init_glfw(bool fullscreen) {
 
-    int glfw_flag = (fullscreen) ? GLFW_FULLSCREEN : GLFW_WINDOW;
+    GLFWmonitor* monitor;
 
     /* Initialize GLFW */
     if (!glfwInit()) {
         return GL_WINDOW_EXIT;
     }
 
-    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
+    monitor = (fullscreen) ? glfwGetPrimaryMonitor(): NULL;
     /* Create a windowed mode window and its OpenGL context */
-    if (!glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 0, 0, 0, 0, glfw_flag)) {
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+        "Game of Life", monitor, NULL);
+    if (!window) {
         return GL_WINDOW_EXIT;
-    }
-    glfwSetWindowTitle("Game of Life");
+    };
+    glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
-    glfwDisable(GLFW_AUTO_POLL_EVENTS);
     glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1, 1);
 
     // Register callbacks
-    glfwSetWindowCloseCallback(*handle_window_close);
-    glfwSetKeyCallback(*handle_keys);
+    glfwSetWindowCloseCallback(window, *handle_window_close);
+    glfwSetKeyCallback(window, *handle_keys);
     return 0;
 }
 
@@ -56,55 +58,56 @@ int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long l
     }
 
     // Destroy glfw
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return return_value;
 }
 
 
-void GLFWCALL handle_keys(int key, int action)
+void handle_keys(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    switch(key) {
-        case GLFW_KEY_ESC:
-        case 'Q':
-            running = false;
-            break;
-        case 'P':
-            playing = false;
-            break;
-        case 'R':
-            playing = true;
-            break;
-        case 'H':
-        case GLFW_KEY_LEFT:
-            lens_move_left(&lens);
-            break;
-        case 'J':
-        case GLFW_KEY_DOWN:
-            lens_move_down(&lens);
-            break;
-        case 'K':
-        case GLFW_KEY_UP:
-            lens_move_up(&lens);
-            break;
-        case 'L':
-        case GLFW_KEY_RIGHT:
-            lens_move_right(&lens);
-            break;
-        case 'I':
-            lens_zoom_in(&lens);
-            break;
-        case 'O':
-            lens_zoom_out(&lens);
-            break;
+    if (action == GLFW_PRESS) {
+        switch(key) {
+            case GLFW_KEY_ESCAPE:
+            case 'Q':
+                running = false;
+                break;
+            case 'P':
+                playing = false;
+                break;
+            case 'R':
+                playing = true;
+                break;
+            case 'H':
+            case GLFW_KEY_LEFT:
+                lens_move_left(&lens);
+                break;
+            case 'J':
+            case GLFW_KEY_DOWN:
+                lens_move_down(&lens);
+                break;
+            case 'K':
+            case GLFW_KEY_UP:
+                lens_move_up(&lens);
+                break;
+            case 'L':
+            case GLFW_KEY_RIGHT:
+                lens_move_right(&lens);
+                break;
+            case 'I':
+                lens_zoom_in(&lens);
+                break;
+            case 'O':
+                lens_zoom_out(&lens);
+                break;
+        }
     }
 }
 
 
-int GLFWCALL handle_window_close(void)
+void handle_window_close(GLFWwindow* window)
 {
     running = false;
-    return GL_FALSE;
 }
 
 void render(Board_t* board, Lens_t* lens, const Rule_t* rule) {
@@ -130,7 +133,7 @@ void render(Board_t* board, Lens_t* lens, const Rule_t* rule) {
         }
     }
     glEnd();
-    glfwSwapBuffers();
+    glfwSwapBuffers(window);
 }
 
 inline void make_quad(float x, float y, float size, const Color_t* color) {
