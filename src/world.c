@@ -67,12 +67,11 @@ Config_t get_config(int argc, char* argv[])
 int world_init(World_t* world, Config_t config)
 {
     FILE *infile;
-
     world->board = malloc(sizeof(Board_t));
     world->next_board = malloc(sizeof(Board_t));
     world->rule = malloc(sizeof(Rule_t));
 
-    // Load rule file
+    // Load board file
     if ((infile = fopen(config.filename, "r")) == NULL) {
         printf("Could not open file %s\n", config.filename);
         world_destroy(world);

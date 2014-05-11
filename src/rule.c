@@ -19,6 +19,11 @@ int rule_init(Rule_t* rule, FILE* infile) {
     int num_transitions;
     int i, j;
 
+    // Lookup table for neighbor counting functions
+    NeighborFunction_t NEIGHBOR_FUNC_LOOKUP[] = {
+        [NEIGHBOR_MOORE]=&board_count_moore_neighbors,
+        [NEIGHBOR_VON_NEUMANN]=&board_count_von_neumann_neighbors
+    };
     // Read number of states
     if (fscanf(infile, "%d", &num_states) == 1) {
         if (num_states <= 0 || num_states > MAX_STATE) {
@@ -36,9 +41,9 @@ int rule_init(Rule_t* rule, FILE* infile) {
     // Read neighbor type definition
     if (fscanf(infile, "%20s", neighbor_string) == 1) {
         if (strncmp(neighbor_string, "moore", 6) == 0) {
-            rule->neighbor_type = NEIGHBOR_MOORE;
+            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_MOORE];
         } else if (strncmp(neighbor_string, "von_neumann", 11) == 0) {
-            rule->neighbor_type = NEIGHBOR_VON_NEUMANN;
+            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_VON_NEUMANN];
         } else {
             printf("Neighbor type is not valid");
             return 1;

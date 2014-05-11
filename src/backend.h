@@ -15,9 +15,7 @@
 #define DEFAULT_SLEEP_TIME 85000
 
 void generate(World_t* world);
-void handle_transition_rule(World_t* world,
-    NeighborFunction_t neighbor_count_func, int x, int y
-);
+void handle_transition_rule(World_t* world, int x, int y);
 void wait(unsigned long long int sleep_time, unsigned long long int* last_time);
 
 #endif

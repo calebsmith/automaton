@@ -19,6 +19,9 @@ typedef enum {
 } Neighbor_t;
 
 
+typedef int (*NeighborFunction_t) (const Board_t*, int, int, unsigned char);
+
+
 typedef struct {
     unsigned char red;
     unsigned char blue;
@@ -38,11 +41,10 @@ typedef struct {
 
 
 typedef struct {
-    Neighbor_t neighbor_type;
+    NeighborFunction_t neighbor_func;
     unsigned short int num_states;
     unsigned short int state_chars[MAX_STATE];
     Color_t state_colors[MAX_STATE];
-
     int transition_length;
     Transition_t** transitions;
 } Rule_t;

@@ -1,10 +1,5 @@
 #include "backend.h"
 
-NeighborFunction_t NEIGHBOR_FUNC_LOOKUP[] = {
-    [NEIGHBOR_MOORE]=&board_count_moore_neighbors,
-    [NEIGHBOR_VON_NEUMANN]=&board_count_von_neumann_neighbors
-};
-
 /*
  * Wait for <sleep_time> adjusted by the difference of the current
  * time and the finishing time of the last loop execution.
@@ -50,17 +45,11 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
 void generate(World_t* world)
 {
     int x, y;
-    NeighborFunction_t neighbor_count_func;
-
-    // Determine the neighbor counting function to be used based on the
-    // neighbor type set in the rule (e.g. Moore neighbors)
-    neighbor_count_func = NEIGHBOR_FUNC_LOOKUP[world->rule->neighbor_type];
-
     // Visit each cell, count its neighbors and determine its state in the next
     // generation. Then swap to the next_board
     for (y = 0; y < world->board->height; y++) {
         for (x = 0; x < world->board->width; x++) {
-            handle_transition_rule(world, neighbor_count_func, x, y);
+            handle_transition_rule(world, x, y);
         }
     }
     // swap boards
@@ -71,8 +60,7 @@ void generate(World_t* world)
  * Determines the next state of a cell at x, y in the board of the given
  * `world` and applies it to next_board according to the world's rule.
  */
-void handle_transition_rule(
-    World_t* world, NeighborFunction_t neighbor_count_func, int x, int y)
+void handle_transition_rule(World_t* world, int x, int y)
 {
     int num_neighbors;
     Transition_t* transition;
@@ -89,7 +77,7 @@ void handle_transition_rule(
         if (current_cell == transition->begin) {
             // If the rule involves neighbor counting
             if (transition->size > 0) {
-                num_neighbors = neighbor_count_func(
+                num_neighbors = world->rule->neighbor_func(
                     world->board, x, y, transition->neighbor_state
                 );
                 for (j = 0; j < transition->size; j++) {
