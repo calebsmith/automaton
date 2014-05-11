@@ -107,7 +107,15 @@ int rule_init(Rule_t* rule, FILE* infile) {
         printf("Could not allocate memory for ruleset\n");
         return 1;
     }
+    for (i = 0; i < num_transitions; i++) {
+        if (!(rule->transitions[i] = malloc(sizeof(Transition_t)))) {
+            printf("Could not allocate memory for ruleset\n");
+            free(rule->transitions);
+            return 1;
+        }
+    }
     if (!(transitions_init(rule->transitions, num_transitions, rule->num_states, infile) == 0)) {
+        rule_destroy(rule);
         return 1;
     }
     return 0;
@@ -123,17 +131,10 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
     char line_buffer[80];
     int i;
     for (i = 0; i < num_transitions; i++) {
-        if (!(transitions[i] = malloc(sizeof(Transition_t)))) {
-            printf("Could not allocate memory for ruleset\n");
-            free(transitions);
-            return 1;
-        }
-
         if (fscanf(infile, "%80s", line_buffer) == 1) {
         } else {
             fprintf(stderr, "buffer is: %s\n", line_buffer);
             printf("Bad transition mapping in rule file on transition %d\n", i);
-            free(transitions);
             return 1;
         }
         neighbor_negator = false;
@@ -145,7 +146,6 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
                     "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state, neighbor_state
                 );
-                free(transitions);
                 return 1;
             }
         } else if (sscanf(line_buffer, "%d->%d:~%d", &state, &end_state, &neighbor_state) == 3) {
@@ -156,7 +156,6 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
                     "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state, neighbor_state
                 );
-                free(transitions);
                 return 1;
             }
             neighbor_negator = true;
@@ -167,14 +166,12 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
                     "state numbers %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state
                 );
-                free(transitions);
                 return 1;
             }
             neighbor_state = -1;
         } else {
-            printf("Bad transition mapping in rule file on transition %d with line %s\n", i, line_buffer);
+            printf("Bad transition mapping in rule file on transition %d with line %s\n", i + 1, line_buffer);
             printf("Example of format: 0->1 or 0->1:1\n");
-            free(transitions);
             return 1;
         }
         transitions[i]->begin = (unsigned char) state;
@@ -185,8 +182,7 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
         if (neighbor_state != -1) {
             fseek(infile, 1, SEEK_CUR);
             if (!(_read_transition_line(infile, &transitions[i]->size, &transitions[i]->transitions) == 0)) {
-                printf("Bad transition line in transition %d\n", i);
-                free(transitions);
+                printf("Bad transition line in transition number %d\n", i + 1);
                 return 1;
             }
         } else {
@@ -223,7 +219,7 @@ int _read_transition_line(FILE* file, int* size, int** results_container)
             results[*size] = integer_value;
             integer_value = 0;
             *size = *size + 1;
-            results = realloc(results, (*size + 1) * sizeof(int));
+            results = realloc(results, *size * sizeof(int));
             if (current == '\n') {
                 break;
             }
