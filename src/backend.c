@@ -78,7 +78,7 @@ void handle_transition_rule(
     int x, int y)
 {
     int num_neighbors;
-    int transition_size;
+    Transition_t* transition;
     int index;
     unsigned char current_cell;
     int i, j;
@@ -87,20 +87,20 @@ void handle_transition_rule(
     index = y * board->width + x;
     current_cell = board_get_cell(board, x, y);
     // Go through each transition rule
-    for (i = 0; i < rule->num_transitions; i++) {
-        if (current_cell == rule->transition_begin[i]) {
-            transition_size = rule->transition_sizes[i];
+    for (i = 0; i < rule->transition_length; i++) {
+        transition = rule->transitions[i];
+        if (current_cell == transition->begin) {
             // If the rule involves neighbor counting
-            if (transition_size > 0) {
+            if (transition->size > 0) {
                 num_neighbors = neighbor_count_func(
-                    board, x, y, rule->transition_neighbor_state[i]
+                    board, x, y, transition->neighbor_state
                 );
-                for (j = 0; j < transition_size; j++) {
+                for (j = 0; j < transition->size; j++) {
                     // Apply transition if count of neighbors matches
                     // any in the list
-                    if (!rule->transition_negator[i]) {
-                        if (num_neighbors == rule->transitions[i][j]) {
-                            next_board->cells[index] = rule->transition_end[i];
+                    if (!transition->negator) {
+                        if (num_neighbors == transition->transitions[j]) {
+                            next_board->cells[index] = transition->end;
                             changed = true;
                             break;
                         }
@@ -108,8 +108,8 @@ void handle_transition_rule(
                         // Make the transition *unless* the right
                         // number of neighbors are present
                         changed = true;
-                        next_board->cells[index] = rule->transition_end[i];
-                        if (num_neighbors == rule->transitions[i][j]) {
+                        next_board->cells[index] = transition->end;
+                        if (num_neighbors == transition->transitions[j]) {
                             next_board->cells[index] = current_cell;
                             break;
                         }
@@ -117,7 +117,7 @@ void handle_transition_rule(
                 }
             } else {
                 // Rule should occur regardless of neighbors
-                next_board->cells[index] = rule->transition_end[i];
+                next_board->cells[index] = transition->end;
                 changed = true;
             }
         }

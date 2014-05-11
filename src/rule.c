@@ -11,16 +11,12 @@
  */
 int rule_init(Rule_t* rule, FILE* infile) {
     int num_states;
+    int state;
     unsigned char state_char;
     char state_color[COLOR_STRING_LENGTH];
     char neighbor_string[NEIGHBOR_STRING_LENGTH];
     int color_digit;
     int num_transitions;
-    unsigned short int state;
-    unsigned short int end_state;
-    int  neighbor_state;
-    bool neighbor_negator;
-    char line_buffer[80];
     int i, j;
 
     // Read number of states
@@ -32,7 +28,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
             );
             return 1;
         }
-        rule->num_states = num_states;
+        rule->num_states = (unsigned short int) num_states;
     } else {
         printf("Number of states not found in rule file\n");
         return 1;
@@ -53,20 +49,20 @@ int rule_init(Rule_t* rule, FILE* infile) {
     }
     // Read state display data. (Character and color values for each state)
     for (i = 0; i < num_states; i++) {
-        if (fscanf(infile, "%hd:%c:%6s", &state, &state_char, state_color) == 3) {
+        if (fscanf(infile, "%d:%c:%6s", &state, &state_char, state_color) == 3) {
             if (state < 0 || state > num_states) {
                 printf(
                     "State number %d is out of bounds in rule file\n", state
                 );
                 return 1;
             }
-            rule->state_chars[state] = state_char;
+            rule->state_chars[state] = (unsigned short int) state_char;
             // Interpret color string and set value
-            rule->state_colors[state].red = 0;
-            rule->state_colors[state].blue = 0;
-            rule->state_colors[state].green = 0;
+            rule->state_colors[state].red = (unsigned char) 0;
+            rule->state_colors[state].blue = (unsigned char) 0;
+            rule->state_colors[state].green = (unsigned char) 0;
             for (j = 0; j < COLOR_STRING_LENGTH; j++) {
-                color_digit = state_color[j];
+                color_digit = (int) state_color[j];
                 if (isdigit(color_digit)) {
                     color_digit -= '0';
                 } else if (color_digit <= 'F' && color_digit >= 'A') {
@@ -94,7 +90,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
             return 1;
         }
     }
-    // Read transition mappings
+    // Read in data for transitions
     if (fscanf(infile, "%d", &num_transitions) == 1) {
         if (num_transitions < 0 || num_transitions > MAX_STATE * MAX_STATE * 2) {
             printf("Number of transitions %d is out of bounds in rule file\n",
@@ -106,23 +102,42 @@ int rule_init(Rule_t* rule, FILE* infile) {
         printf("Failed to define number of transitions in rule file\n");
         return 1;
     }
-    rule->num_transitions = num_transitions;
-    rule->transition_begin = malloc(num_transitions * sizeof(unsigned char));
-    rule->transition_end = malloc(num_transitions * sizeof(unsigned char));
-    rule->transition_neighbor_state = malloc(num_transitions * sizeof(int));
-    rule->transition_negator = malloc(num_transitions * sizeof(bool));
-    rule->transition_sizes = malloc(num_transitions * sizeof(int));
-    rule->transitions = malloc(num_transitions * sizeof(int*));
+    rule->transition_length = num_transitions;
+    if (!(rule->transitions = malloc(num_transitions * sizeof(Transition_t*)))) {
+        printf("Could not allocate memory for ruleset\n");
+        return 1;
+    }
+    if (!(transitions_init(rule->transitions, num_transitions, rule->num_states, infile) == 0)) {
+        return 1;
+    }
+    return 0;
+}
 
+
+int transitions_init(Transition_t** transitions, int num_transitions, unsigned short int num_states, FILE* infile)
+{
+    int state;
+    int end_state;
+    int  neighbor_state;
+    bool neighbor_negator;
+    char line_buffer[80];
+    int i;
     for (i = 0; i < num_transitions; i++) {
+        if (!(transitions[i] = malloc(sizeof(Transition_t)))) {
+            printf("Could not allocate memory for ruleset\n");
+            free(transitions);
+            return 1;
+        }
+
         if (fscanf(infile, "%80s", line_buffer) == 1) {
         } else {
             fprintf(stderr, "buffer is: %s\n", line_buffer);
             printf("Bad transition mapping in rule file on transition %d\n", i);
+            free(transitions);
             return 1;
         }
         neighbor_negator = false;
-        if (sscanf(line_buffer, "%hd->%hd:%d", &state, &end_state, &neighbor_state) == 3) {
+        if (sscanf(line_buffer, "%d->%d:%d", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states) ||
                 (neighbor_state < 0 || neighbor_state > num_states)) {
@@ -130,9 +145,10 @@ int rule_init(Rule_t* rule, FILE* infile) {
                     "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state, neighbor_state
                 );
+                free(transitions);
                 return 1;
             }
-        } else if (sscanf(line_buffer, "%hd->%hd:~%d", &state, &end_state, &neighbor_state) == 3) {
+        } else if (sscanf(line_buffer, "%d->%d:~%d", &state, &end_state, &neighbor_state) == 3) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states) ||
                 (neighbor_state < 0 || neighbor_state > num_states)) {
@@ -140,41 +156,46 @@ int rule_init(Rule_t* rule, FILE* infile) {
                     "state numbers %d or %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state, neighbor_state
                 );
+                free(transitions);
                 return 1;
             }
             neighbor_negator = true;
-        } else if (sscanf(line_buffer, "%hd->%hd", &state, &end_state) == 2) {
+        } else if (sscanf(line_buffer, "%d->%d", &state, &end_state) == 2) {
             if ((state < 0 || state > num_states) ||
                 (end_state < 0 || end_state > num_states)) {
                 printf(
                     "state numbers %d or %d are out of bounds in transition portion rule file\n",
                     state, end_state
                 );
+                free(transitions);
                 return 1;
             }
             neighbor_state = -1;
         } else {
             printf("Bad transition mapping in rule file on transition %d with line %s\n", i, line_buffer);
             printf("Example of format: 0->1 or 0->1:1\n");
+            free(transitions);
             return 1;
         }
-        rule->transition_begin[i] = state;
-        rule->transition_end[i] = end_state;
-        rule->transition_neighbor_state[i] = neighbor_state;
-        rule->transition_negator[i] = neighbor_negator;
-        rule->transitions[i] = malloc(sizeof(int));
+        transitions[i]->begin = (unsigned char) state;
+        transitions[i]->end = (unsigned char) end_state;
+        transitions[i]->neighbor_state = (unsigned char) neighbor_state;
+        transitions[i]->negator = neighbor_negator;
+        transitions[i]->size = 0;
         if (neighbor_state != -1) {
             fseek(infile, 1, SEEK_CUR);
-            if (_read_transition_line(infile, &rule->transition_sizes[i], i, rule->transitions)) {
+            if (!(_read_transition_line(infile, &transitions[i]->size, &transitions[i]->transitions) == 0)) {
                 printf("Bad transition line in transition %d\n", i);
+                free(transitions);
                 return 1;
             }
         } else {
-            rule->transition_sizes[i] = 0;
+            transitions[i]->size = 0;
         }
     }
     return 0;
 }
+
 
 /*
  * Reads a line of comma separated integers from a FILE stream
@@ -184,14 +205,16 @@ int rule_init(Rule_t* rule, FILE* infile) {
  * Side-Effect: Sets the results list of the values found to result, and the
  *     size of the results to the size provided
  */
-int _read_transition_line(FILE* file, int* size, int index, int** results_container)
+int _read_transition_line(FILE* file, int* size, int** results_container)
 {
     int current;
     int integer_value = 0;
     int* results;
 
     *size = 0;
-    results = malloc(sizeof(int));
+    if (!(results = malloc(sizeof(int)))) {
+        return 1;
+    }
     while(true) {
         current = fgetc(file);
         if (isdigit(current)) {
@@ -210,9 +233,10 @@ int _read_transition_line(FILE* file, int* size, int index, int** results_contai
             return 1;
         }
     }
-    results_container[index] = results;
+    *results_container = results;
     return 0;
 }
+
 
 /*
  * Given a rule, deallocate all dynamically allocated members. Must be called
@@ -225,16 +249,13 @@ void rule_destroy(Rule_t* rule)
 {
     int i;
 
-    free(rule->transition_begin);
-    free(rule->transition_end);
-    free(rule->transition_neighbor_state);
-    free(rule->transition_negator);
-    free(rule->transition_sizes);
-    for (i = 0; i < rule->num_transitions; i++) {
+    for (i = 0; i < rule->transition_length; i++) {
+        free(rule->transitions[i]->transitions);
         free(rule->transitions[i]);
     }
     free(rule->transitions);
 }
+
 
 /*
  * Given a rule, prints its values for debugging
