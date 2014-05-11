@@ -1,15 +1,15 @@
 Change log
 ==========
 
-v0.0.7 (Unreleased)
+v0.0.7 (May 11 2014)
 --------------------
     * Upgraded glfw to version 3
     * Added a "world" module to simplify loading and passing boards and rules
         data
     * Improved Makefile to use object files
     * Fixed a bug to make the error when no filename is given print correctly
-    * Fixed some small memory leaks (exit time leaks, not constant heap
-          allocations)
+    * Fixed some bad calls to free() on program exit under some conditions
+        (was crashing on exit for some rulesets)
 
 v0.0.6 (Oct 18 2013)
 --------------------
