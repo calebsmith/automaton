@@ -20,24 +20,29 @@ contribute by making a pull request or opening an issue with links to good
 documentation.
 
 
-Requirements
+Dependencies
 ------------
 
- * git 1.7.9
- * gcc 4.6.3
- * make 3.8.1
- * curses 5.9
+ * ncurses 5.9.6
  * opengl
+ * glfw 3.0.4
+
+For Arch these are provided in the following packages:
+
  * glfw
+ * ncurses
 
 For Debian GNU/Linux these are provided in the following packages:
 
- * git
- * gcc
- * make
  * libncurses5-dev
  * libglu1-mesa-dev
- * libglfw-dev
+ * (must install glfw 3 from source)
+
+The base requirements for compiling are:
+
+ * git 1.7.9
+ * make 3.8.1
+ * gcc 4.6.3
 
 
 Installation
