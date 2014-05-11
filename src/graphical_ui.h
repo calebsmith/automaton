@@ -11,8 +11,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "board.h"
-#include "rule.h"
+#include "world.h"
 #include "lens.h"
 #include "backend.h"
 
@@ -21,8 +20,8 @@
 #define GL_WINDOW_EXIT 4
 
 int init_glfw(bool fullscreen);
-int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time, bool fullscreen);
-void render(Board_t* board, Lens_t* lens, const Rule_t* rule);
+int main_glfw(World_t* world, unsigned long long int sleep_time, bool fullscreen);
+void render(World_t* world, Lens_t* lens);
 void make_quad(float x, float y, float size, const Color_t* color);
 
 void handle_keys(GLFWwindow* window, int key, int scancode, int action, int mods);

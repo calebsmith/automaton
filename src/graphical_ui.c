@@ -34,21 +34,21 @@ int init_glfw(bool fullscreen) {
 }
 
 
-int main_glfw(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time, bool fullscreen) {
+int main_glfw(World_t* world, unsigned long long int sleep_time, bool fullscreen) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
     int return_value = 0;
 
-    lens_init(&lens, board, WINDOW_WIDTH, WINDOW_HEIGHT, true);
+    lens_init(&lens, world->board, WINDOW_WIDTH, WINDOW_HEIGHT, true);
 
     // Display game board, find next generation, wait for time and loop
     if (!init_glfw(fullscreen)) {
         while (running) {
             glfwPollEvents();
-            render(board, &lens, rule);
+            render(world, &lens);
             if (playing) {
-                generate(next_board, board, rule);
+                generate(world);
                 wait(sleep_time, &last_time);
             }
         }
@@ -110,24 +110,24 @@ void handle_window_close(GLFWwindow* window)
     running = false;
 }
 
-void render(Board_t* board, Lens_t* lens, const Rule_t* rule) {
+void render(World_t* world, Lens_t* lens) {
     float x, y;
     int display_x, display_y;
     int value;
 
-    lens_set(lens, board, WINDOW_WIDTH, WINDOW_HEIGHT);
+    lens_set(lens, world->board, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBegin(GL_QUADS);
     for(y = lens->min_y; y < lens->max_y; y++) {
         for(x = lens->min_x; x < lens->max_x; x++) {
-            value = board_get_cell(board, x, y);
+            value = board_get_cell(world->board, x, y);
             display_x = x - lens->x_display_offset;
             display_y = y - lens->y_display_offset;
             if (value != 0) {
                 make_quad(
                     display_x, display_y, lens->scale,
-                    &rule->state_colors[value]
+                    &(world->rule->state_colors[value])
                 );
             }
         }

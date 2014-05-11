@@ -8,13 +8,12 @@
 
 #include <curses.h>
 
-#include "board.h"
-#include "rule.h"
+#include "world.h"
 #include "lens.h"
 #include "backend.h"
 
 WINDOW* init_curses(void);
-void display_curses(const Board_t* board, Lens_t* lens, const Rule_t* rule, WINDOW* window);
-void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time);
+void display_curses(World_t* world, Lens_t* lens, WINDOW* window);
+void main_curses(World_t* world, unsigned long long int sleep_time);
 
 #endif
