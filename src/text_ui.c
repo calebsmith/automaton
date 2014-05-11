@@ -73,10 +73,10 @@ void main_curses(World_t* world, unsigned long long int sleep_time) {
 /*
  * Displays the current board in a curses window
  *
- * Parameters: World_t* world, Lens_t* lens, WINDOW* display_area
+ * Parameters: const World_t* world, Lens_t* lens, WINDOW* display_area
  * Return: void
  */
-void display_curses(World_t* world, Lens_t* lens, WINDOW* window)
+void display_curses(const World_t* world, Lens_t* lens, WINDOW* window)
 {
     int x, y;
     int display_x, display_y;

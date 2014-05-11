@@ -110,7 +110,7 @@ void handle_window_close(GLFWwindow* window)
     running = false;
 }
 
-void render(World_t* world, Lens_t* lens) {
+void render(const World_t* world, Lens_t* lens) {
     float x, y;
     int display_x, display_y;
     int value;

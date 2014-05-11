@@ -13,7 +13,7 @@
 #include "backend.h"
 
 WINDOW* init_curses(void);
-void display_curses(World_t* world, Lens_t* lens, WINDOW* window);
+void display_curses(const World_t* world, Lens_t* lens, WINDOW* window);
 void main_curses(World_t* world, unsigned long long int sleep_time);
 
 #endif

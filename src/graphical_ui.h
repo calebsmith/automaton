@@ -21,7 +21,7 @@
 
 int init_glfw(bool fullscreen);
 int main_glfw(World_t* world, unsigned long long int sleep_time, bool fullscreen);
-void render(World_t* world, Lens_t* lens);
+void render(const World_t* world, Lens_t* lens);
 void make_quad(float x, float y, float size, const Color_t* color);
 
 void handle_keys(GLFWwindow* window, int key, int scancode, int action, int mods);
