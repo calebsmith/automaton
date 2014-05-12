@@ -8,18 +8,14 @@
 
 #include <time.h>
 
-#include "board.h"
-#include "rule.h"
+#include "world.h"
 
 #define NANO 1000000000 // convert nanoseconds to seconds
 // Default number of milliseconds to sleep
 #define DEFAULT_SLEEP_TIME 85000
 
-void generate(Board_t* next_board, Board_t* board, Rule_t* rule);
-void handle_transition_rule(
-    Board_t* board, Board_t* next_board, Rule_t* rule,
-    NeighborFunction_t neighbor_count_func, int x, int y
-);
+void generate(World_t* world);
+void handle_transition_rule(World_t* world, int x, int y);
 void wait(unsigned long long int sleep_time, unsigned long long int* last_time);
 
 #endif

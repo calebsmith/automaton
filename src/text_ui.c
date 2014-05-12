@@ -21,7 +21,7 @@ WINDOW* init_curses(void)
 }
 
 
-void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned long long int sleep_time) {
+void main_curses(World_t* world, unsigned long long int sleep_time) {
     // Initialize the `last_time` variable for the real-time clock. Tracks the
     // time the last loop began for calculating time to wait.
     unsigned long long last_time = 0;
@@ -33,7 +33,7 @@ void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned lon
     WINDOW* window = init_curses();
 
     Lens_t lens;
-    lens_init(&lens, board, 132, 43, false);
+    lens_init(&lens, world->board, 132, 43, false);
 
     // Display game board, find next generation, wait for time and loop
     while(running) {
@@ -60,8 +60,8 @@ void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned lon
             lens_move_right(&lens);
         }
         if (playing) {
-            display_curses(board, &lens, rule, window);
-            generate(next_board, board, rule);
+            display_curses(world, &lens, window);
+            generate(world);
             wait(sleep_time, &last_time);
         }
     }
@@ -73,11 +73,10 @@ void main_curses(Board_t* board, Board_t* next_board, Rule_t* rule, unsigned lon
 /*
  * Displays the current board in a curses window
  *
- * Parameters: Board_t* board, Lens_t* lens, const Rule_t* rule,
- *     WINDOW* display_area
+ * Parameters: const World_t* world, Lens_t* lens, WINDOW* display_area
  * Return: void
  */
-void display_curses(const Board_t* board, Lens_t* lens, const Rule_t* rule, WINDOW* window)
+void display_curses(const World_t* world, Lens_t* lens, WINDOW* window)
 {
     int x, y;
     int display_x, display_y;
@@ -87,19 +86,19 @@ void display_curses(const Board_t* board, Lens_t* lens, const Rule_t* rule, WIND
 
     // determine terminal's rows and columns. Display cell if in bounds
     getmaxyx(window, display_height, display_width);
-    lens_set(lens, board, display_width, display_height);
+    lens_set(lens, world->board, display_width, display_height);
     // clear the display of the old frame
     clear();
     for(y = lens->min_y; y < lens->max_y; y++) {
         for(x = lens->min_x; x < lens->max_x; x++) {
-            value = board_get_cell(board, x, y);
+            value = board_get_cell(world->board, x, y);
             // Adjust display coordinates by the BOARD_BORDER_SIZE offset
             display_x = x - lens->x_display_offset;
             display_y = y - lens->y_display_offset;
             move(display_y, display_x);
             // display o for each living cell within the terminal
             if (display_y < display_height && display_x < display_width) {
-                display_value = rule->state_chars[value];
+                display_value = world->rule->state_chars[value];
                 if (display_value != ' ') {
                     insch(display_value);
                 }

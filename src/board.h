@@ -41,8 +41,6 @@ typedef struct {
     char rule_filename[RULE_FILENAME_LENGTH];
 } Board_t;
 
-typedef int (*NeighborFunction_t) (const Board_t*, int, int, unsigned char);
-
 void board_init(Board_t* board, FILE* infile, int toroidal);
 void board_copy(Board_t* board_a, const Board_t* board_b);
 void board_swap(Board_t* board_a, Board_t* board_b);
