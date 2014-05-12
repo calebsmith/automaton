@@ -251,7 +251,9 @@ void rule_destroy(Rule_t* rule)
     int i;
 
     for (i = 0; i < rule->transition_length; i++) {
-        free(rule->transitions[i]->transitions);
+        if (rule->transitions[i]->size > 0) {
+            free(rule->transitions[i]->transitions);
+        }
         free(rule->transitions[i]);
     }
     free(rule->transitions);
