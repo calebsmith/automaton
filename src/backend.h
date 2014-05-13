@@ -9,6 +9,7 @@
 #include <time.h>
 
 #include "world.h"
+#include "scm.h"
 
 #define NANO 1000000000 // convert nanoseconds to seconds
 // Default number of milliseconds to sleep

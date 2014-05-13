@@ -47,6 +47,7 @@ typedef struct {
     Color_t state_colors[MAX_STATE];
     int transition_length;
     Transition_t** transitions;
+    bool scm;
 } Rule_t;
 
 

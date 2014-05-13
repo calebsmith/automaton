@@ -123,6 +123,7 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule_destroy(rule);
         return 1;
     }
+    rule->scm = true;
     return 0;
 }
 
@@ -135,6 +136,7 @@ int transitions_init(Transition_t** transitions, int num_transitions, unsigned s
     bool neighbor_negator;
     char line_buffer[80];
     int i;
+
     for (i = 0; i < num_transitions; i++) {
         if (fscanf(infile, "%80s", line_buffer) == 1) {
         } else {
