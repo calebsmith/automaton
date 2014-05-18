@@ -44,18 +44,17 @@ void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
  */
 void generate(World_t* world)
 {
-    int x, y;
-
     // Visit each cell, count its neighbors and determine its state in the next
     // generation. Then swap to the next_board
-    for (y = 0; y < world->board->height; y++) {
-        for (x = 0; x < world->board->width; x++) {
-            if (world->rule->scm) {
+    if (world->rule->scm) {
+        scm_generate(world);
+    } else {
+        for (int y = 0; y < world->board->height; y++) {
+            for (int x = 0; x < world->board->width; x++) {
                 handle_transition_rule(world, x, y);
             }
         }
     }
-    scm_generate(world);
     // swap boards
     board_swap(world->board, world->next_board);
 }
