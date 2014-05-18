@@ -1,32 +1,49 @@
 #include "scm.h"
 
+World_t world;
 
-void scm_handle_cell(const World_t* world, int cell_x, int cell_y)
+
+SCM scm_neighbor_count(SCM x_in, SCM y_in, SCM state_in)
 {
-    SCM func;
-    SCM cell_value;
-    SCM cell_list;
-    SCM current_cell;
-    int x, y;
-    unsigned char result;
+    int x = scm_to_int(x_in);
+    int y = scm_to_int(y_in);
+    unsigned char state = scm_to_uchar(state_in);
+    return scm_from_int(
+        world.rule->neighbor_func(world.board, x, y, state));
+}
 
-    /* Create a Scheme list of ints for get-cell to use */
-    cell_list = scm_list_n(SCM_UNDEFINED);
-    for (y = cell_y - 1; y <= cell_y + 1; y++) {
-        for (x = cell_x - 1; x <= cell_x + 1; x++) {
-            cell_value = scm_from_uchar(board_get_cell(world->board, x, y));
-            cell_list = scm_append_x(
-                scm_list_n(cell_list,
-                    scm_list_n(cell_value, SCM_UNDEFINED), SCM_UNDEFINED));
-        }
-    }
-    func  = scm_variable_ref(scm_c_public_lookup("gameoflife", "get-next-cell"));
-    current_cell = scm_from_uchar(board_get_cell(world->board, cell_x, cell_y));
-    result = scm_to_uchar(scm_call_2(func, cell_list, current_cell));
-    world->next_board->cells[(cell_y * world->board->width + cell_x)] = result;
+SCM scm_get_cell(SCM x, SCM y)
+{
+    return scm_from_uchar(
+        board_get_cell(world.board, scm_to_int(x), scm_to_int(y)));
+}
+
+SCM scm_set_cell(SCM x_in, SCM y_in, SCM state)
+{
+    int x = scm_to_int(x_in);
+    int y = scm_to_int(y_in);
+    world.next_board->cells[(y * world.board->width + x)] = scm_to_uchar(state);
+    return SCM_UNDEFINED;
 }
 
 void *register_scm_functions(void* data)
 {
+    scm_c_define_gsubr("board-neighbor-count", 3, 0, 0, &scm_neighbor_count);
+    scm_c_define_gsubr("board-get-cell", 2, 0, 0, &scm_get_cell);
+    scm_c_define_gsubr("board-set-cell", 3, 0, 0, &scm_set_cell);
     return NULL;
+}
+
+void scm_generate(World_t* world)
+{
+    SCM func;
+    int x, y;
+
+    func  = scm_variable_ref(scm_c_public_lookup("gameoflife", "get-next-cell"));
+    /* Create a Scheme list of ints for get-cell to use */
+    for (y = 0; y < world->board->height; y++) {
+        for (x = 0; x < world->board->width; x++) {
+            scm_call_2(func, scm_from_int(x), scm_from_int(y));
+        }
+    }
 }

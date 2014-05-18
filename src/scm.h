@@ -8,7 +8,10 @@
 
 #include "world.h"
 
-void scm_handle_cell(const World_t* world, int cell_x, int cell_y);
+void scm_generate(World_t* world);
+SCM scm_get_cell(SCM x, SCM y);
+SCM scm_set_cell(SCM x, SCM y, SCM state);
+SCM scm_neighbor_count(SCM x, SCM y, SCM state);
 void *register_scm_functions(void* data);
 
 #endif

@@ -51,12 +51,11 @@ void generate(World_t* world)
     for (y = 0; y < world->board->height; y++) {
         for (x = 0; x < world->board->width; x++) {
             if (world->rule->scm) {
-                scm_handle_cell(world, x, y);
-            } else {
                 handle_transition_rule(world, x, y);
             }
         }
     }
+    scm_generate(world);
     // swap boards
     board_swap(world->board, world->next_board);
 }

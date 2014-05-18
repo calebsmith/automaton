@@ -1,16 +1,6 @@
 (define-module (gameoflife)
     #:export (get-next-cell))
 
-(define (get-next-cell board cell)
-    (board-neighbor->cell cell (board-count-neighbor board)))
-
-
-(define (board-count-neighbor board)
-    (apply + (map (lambda (x y)
-        (list-ref board (+ (* y 3) x)))
-            '(0 1 2 0 2 0 1 2)
-            '(0 0 0 1 1 2 2 2))))
-
 
 (define (board-neighbor->cell c n)
     (if (= c 0)
@@ -20,3 +10,18 @@
         (if (or (= n 2) (= n 3))
             1
             0)))
+
+(define (get-next-cell x y)
+    (board-set-cell x y (board-neighbor->cell (board-get-cell x y) (board-neighbor-count x y 1))))
+
+
+;(define (generate width height)
+;    (define new-board (make-vector (* width height)))
+;    (map (lambda (y)
+;       (map (lambda (x)
+;            (let ((num-neighbors (board-neighbor-count x y 1))
+;                  (current (board-get-cell x y)))
+;                (board-set-cell x y (board-neighbor->cell current num-neighbors))))
+;            (iota width)))
+;       (iota height))
+;    new-board)

@@ -66,6 +66,8 @@ const char* USAGE_STRING = ""
 "* o - zoom out\n";
 
 
+World_t world;
+
 void inner_main(void *nop, int argc, char** argv);
 
 
@@ -78,7 +80,6 @@ int main(int argc, char* argv[])
 
 void inner_main(void *nop, int argc, char** argv)
 {
-    World_t world;
     Config_t config;
 
     // Parse the command line arguments and store into config
@@ -87,13 +88,13 @@ void inner_main(void *nop, int argc, char** argv)
         printf("%s", USAGE_STRING);
         return;
     }
-    // Register functions for scheme and load the scheme module
-    scm_with_guile(&register_scm_functions, NULL);
-    scm_c_primitive_load("scm/gameoflife.scm");
     // Load board and ruleset into 'world'
     if (world_init(&world, config)) {
         return;
     }
+    // Register functions for scheme and load the scheme module
+    scm_c_primitive_load("scm/gameoflife.scm");
+    scm_with_guile(&register_scm_functions, NULL);
     // Enter main loop
     if (config.graphical) {
         main_glfw(&world, config.sleep_time * 1000, config.fullscreen);
