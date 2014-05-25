@@ -38,11 +38,12 @@ void *register_scm_functions(void* data)
 void scm_generate(World_t* world)
 {
     SCM func = scm_variable_ref(scm_c_public_lookup("gameoflife", "get-next-cell"));
-    int width = world->board->width;
+    unsigned char result_cell;
     for (int y = 0; y < world->board->height; y++) {
         for (int x = 0; x < world->board->width; x++) {
-            world->next_board->cells[y * width + x] = scm_to_uchar(scm_call_2(
+            result_cell = scm_to_uchar(scm_call_2(
                 func, scm_from_int(x), scm_from_int(y)));
+            board_set_cell(world->next_board, x, y, result_cell);
         }
     }
 }

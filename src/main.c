@@ -93,6 +93,7 @@ void inner_main(void *nop, int argc, char** argv)
         return;
     }
     // Register functions for scheme and load the scheme module
+    scm_c_primitive_load("scm/core.scm");
     scm_c_primitive_load("scm/gameoflife.scm");
     scm_with_guile(&register_scm_functions, NULL);
     // Enter main loop
