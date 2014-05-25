@@ -1,7 +1,8 @@
 2
-moore
 0: :000000
 1:o:FFFFFF
+scm/gameoflife.scm:gameoflife:get-next-cell
+moore
 2
 0->1:1
 3

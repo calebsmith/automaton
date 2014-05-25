@@ -15,6 +15,11 @@ int rule_init(Rule_t* rule, FILE* infile) {
     unsigned char state_char;
     char state_color[COLOR_STRING_LENGTH];
     char neighbor_string[NEIGHBOR_STRING_LENGTH];
+    char scm_string[140];
+    char scm_filename_string[140];
+    char scm_module_string[140];
+    char scm_function_string[140];
+    int scm_number = 1;
     int color_digit;
     int num_transitions;
     int i, j;
@@ -36,20 +41,6 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule->num_states = (unsigned short int) num_states;
     } else {
         printf("Number of states not found in rule file\n");
-        return 1;
-    }
-    // Read neighbor type definition
-    if (fscanf(infile, "%20s", neighbor_string) == 1) {
-        if (strncmp(neighbor_string, "moore", 6) == 0) {
-            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_MOORE];
-        } else if (strncmp(neighbor_string, "von_neumann", 11) == 0) {
-            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_VON_NEUMANN];
-        } else {
-            printf("Neighbor type is not valid");
-            return 1;
-        }
-    } else {
-        printf("Neighbor type definition invalid or not found in rule file\n");
         return 1;
     }
     // Read state display data. (Character and color values for each state)
@@ -95,6 +86,42 @@ int rule_init(Rule_t* rule, FILE* infile) {
             return 1;
         }
     }
+    // Read scheme file:module:function definition
+    if (fscanf(infile, "%140s", scm_string) == 1) {
+        if (sscanf(scm_string, "%[^:]:%[^:]:%s", scm_filename_string, scm_module_string, scm_function_string) == 3) {
+            rule->scm = true;
+            scm_c_primitive_load("scm/gameoflife.scm");
+            rule->scm_cell_func = scm_variable_ref(scm_c_public_lookup(
+                "gameoflife", "get-next-cell"));
+        } else if (sscanf(scm_string, "%d", &scm_number) == 1) {
+            if (scm_number == 0) {
+                rule->scm = false;
+            } else {
+                printf("Scheme module definition is not valid\n");
+                return 1;
+            }
+        } else {
+            printf("Scheme module definition is not valid\n");
+            return 1;
+        }
+    } else {
+        printf("Scheme module defition invalid or not found in rule file\n");
+        return 1;
+    }
+    // Read neighbor type definition
+    if (fscanf(infile, "%20s", neighbor_string) == 1) {
+        if (strncmp(neighbor_string, "moore", 6) == 0) {
+            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_MOORE];
+        } else if (strncmp(neighbor_string, "von_neumann", 11) == 0) {
+            rule->neighbor_func = NEIGHBOR_FUNC_LOOKUP[NEIGHBOR_VON_NEUMANN];
+        } else {
+            printf("Neighbor type is not valid\n");
+            return 1;
+        }
+    } else {
+        printf("Neighbor type definition invalid or not found in rule file\n");
+        return 1;
+    }
     // Read in data for transitions
     if (fscanf(infile, "%d", &num_transitions) == 1) {
         if (num_transitions < 0 || num_transitions > MAX_STATE * MAX_STATE * 2) {
@@ -123,10 +150,6 @@ int rule_init(Rule_t* rule, FILE* infile) {
         rule_destroy(rule);
         return 1;
     }
-    rule->scm = true;
-    scm_c_primitive_load("scm/gameoflife.scm");
-    rule->scm_cell_func = scm_variable_ref(scm_c_public_lookup(
-        "gameoflife", "get-next-cell"));
     return 0;
 }
 
