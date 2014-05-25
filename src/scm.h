@@ -10,8 +10,8 @@
 
 void scm_generate(World_t* world);
 SCM scm_get_cell(SCM x, SCM y);
-SCM scm_set_cell(SCM x, SCM y, SCM state);
-SCM scm_neighbor_count(SCM x, SCM y, SCM state);
+SCM scm_von_neumann_neighbors(SCM x_in, SCM y_in, SCM state_in);
+SCM scm_moore_neighbors(SCM x_in, SCM y_in, SCM state_in);
 void *register_scm_functions(void* data);
 
 #endif
