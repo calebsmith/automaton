@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <libguile.h>
 #include "board.h"
 
 #define COLOR_STRING_LENGTH 6
@@ -48,6 +49,7 @@ typedef struct {
     int transition_length;
     Transition_t** transitions;
     bool scm;
+    SCM scm_cell_func;
 } Rule_t;
 
 

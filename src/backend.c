@@ -46,7 +46,7 @@ void generate(World_t* world)
 {
     // Visit each cell, count its neighbors and determine its state in the next
     // generation. Then swap to the next_board
-    if (world->rule->scm) {
+    if (world->rule->scm == true) {
         scm_generate(world);
     } else {
         for (int y = 0; y < world->board->height; y++) {

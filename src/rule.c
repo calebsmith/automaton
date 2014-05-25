@@ -124,6 +124,9 @@ int rule_init(Rule_t* rule, FILE* infile) {
         return 1;
     }
     rule->scm = true;
+    scm_c_primitive_load("scm/gameoflife.scm");
+    rule->scm_cell_func = scm_variable_ref(scm_c_public_lookup(
+        "gameoflife", "get-next-cell"));
     return 0;
 }
 
