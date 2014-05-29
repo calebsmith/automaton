@@ -88,26 +88,27 @@ int rule_init(Rule_t* rule, FILE* infile) {
     }
     // Read scheme file:module:function definition
     if (fscanf(infile, "%140s", scm_string) == 1) {
-        if (sscanf(scm_string, "%[^:]:%[^:]:%s", scm_filename_string, scm_module_string, scm_function_string) == 3) {
+        if (sscanf(scm_string, "%140[^:]:%140[^:]:%140s",
+            scm_filename_string, scm_module_string, scm_function_string) == 3) {
             rule->scm = true;
-            scm_c_primitive_load("scm/gameoflife.scm");
+            scm_c_primitive_load(scm_filename_string);
             rule->scm_cell_func = scm_variable_ref(scm_c_public_lookup(
-                "gameoflife", "get-next-cell"));
+                scm_module_string, scm_function_string));
             rule->transition_length = 0;
             return 0;
         } else if (sscanf(scm_string, "%d", &scm_number) == 1) {
             if (scm_number == 0) {
                 rule->scm = false;
             } else {
-                printf("Scheme module definition is not valid\n");
+                printf("Scheme filename/module definition is not valid\n");
                 return 1;
             }
         } else {
-            printf("Scheme module definition is not valid\n");
+            printf("Scheme filename/module definition is not valid\n");
             return 1;
         }
     } else {
-        printf("Scheme module defition invalid or not found in rule file\n");
+        printf("Scheme filename/module defition invalid or not found in rule file\n");
         return 1;
     }
     // Read neighbor type definition

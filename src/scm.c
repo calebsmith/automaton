@@ -37,8 +37,9 @@ void *register_scm_functions(void* data)
 
 void scm_generate(World_t* world)
 {
-    SCM func = scm_variable_ref(scm_c_public_lookup("gameoflife", "get-next-cell"));
     unsigned char result_cell;
+    SCM func = world->rule->scm_cell_func;
+
     for (int y = 0; y < world->board->height; y++) {
         for (int x = 0; x < world->board->width; x++) {
             result_cell = scm_to_uchar(scm_call_2(
