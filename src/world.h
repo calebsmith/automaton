@@ -37,8 +37,12 @@ typedef struct {
     Rule_t* rule;
 } World_t;
 
+
 Config_t get_config(int argc, char* argv[]);
 
 int world_init(World_t* world, Config_t config);
 void world_destroy(World_t* world);
+
+extern World_t world_g;
+
 #endif

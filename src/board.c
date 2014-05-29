@@ -158,6 +158,10 @@ int board_get_cell(const Board_t* board, int x, int y)
     return board->cells[index];
 }
 
+void board_set_cell(const Board_t* board, int x, int y, unsigned char state)
+{
+    board->cells[y * board->width + x] = state;
+}
 /*
  * Given a Board_t pointer and x,y coordinates, returns the number
  * of Moore neighbors for the cell at x,y (diagonally and orthoganally

@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string.h>
 
 #include "world.h"
+#include "scm.h"
 #include "text_ui.h"
 #include "graphical_ui.h"
 
@@ -65,26 +66,39 @@ const char* USAGE_STRING = ""
 "* o - zoom out\n";
 
 
+World_t world_g;
+
+void inner_main(void *nop, int argc, char** argv);
+
+
 int main(int argc, char* argv[])
 {
-    int world_result;
-    World_t world;
+    scm_boot_guile(argc, argv, &inner_main, NULL);
+    return 0;
+}
+
+
+void inner_main(void *nop, int argc, char** argv)
+{
     Config_t config;
 
     // Parse the command line arguments and store into config
     config = get_config(argc, argv);
     if (config.help) {
         printf("%s", USAGE_STRING);
-        return 0;
+        return;
     }
-    if ((world_result = world_init(&world, config))) {
-        return world_result;
+    // Load board and ruleset into 'world'
+    if (world_init(&world_g, config)) {
+        return;
     }
+    // Register C primitive functions for Scheme
+    scm_with_guile(&register_scm_functions, NULL);
+    // Enter main loop
     if (config.graphical) {
-        main_glfw(&world, config.sleep_time * 1000, config.fullscreen);
+        main_glfw(&world_g, config.sleep_time * 1000, config.fullscreen);
     } else {
-        main_curses(&world, config.sleep_time * 1000);
+        main_curses(&world_g, config.sleep_time * 1000);
     }
-    world_destroy(&world);
-    return 0;
+    world_destroy(&world_g);
 }

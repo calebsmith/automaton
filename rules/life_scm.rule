@@ -1,0 +1,4 @@
+2
+0: :000000
+1:o:FFFFFF
+scm/gameoflife.scm:gameoflife:get-next-cell
