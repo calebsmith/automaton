@@ -1,6 +1,12 @@
 Change log
 ==========
 
+v0.0.8 (Unreleased)
+-------------------
+    * Added support for defining automata rules in Scheme.
+    * Uses pkg-config for glfw3 linker flags to make builds on different
+        distributions simpler
+
 v0.0.7 (May 11 2014)
 --------------------
     * Upgraded glfw to version 3
