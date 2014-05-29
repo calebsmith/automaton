@@ -93,6 +93,8 @@ int rule_init(Rule_t* rule, FILE* infile) {
             scm_c_primitive_load("scm/gameoflife.scm");
             rule->scm_cell_func = scm_variable_ref(scm_c_public_lookup(
                 "gameoflife", "get-next-cell"));
+            rule->transition_length = 0;
+            return 0;
         } else if (sscanf(scm_string, "%d", &scm_number) == 1) {
             if (scm_number == 0) {
                 rule->scm = false;
@@ -284,7 +286,9 @@ void rule_destroy(Rule_t* rule)
         }
         free(rule->transitions[i]);
     }
-    free(rule->transitions);
+    if (rule->transition_length > 0) {
+        free(rule->transitions);
+    }
 }
 
 
