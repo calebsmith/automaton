@@ -82,8 +82,6 @@ void inner_main(void *nop, int argc, char** argv)
 {
     Config_t config;
 
-    // Load Scheme built-ins
-    scm_c_primitive_load("scm/core.scm");
     // Parse the command line arguments and store into config
     config = get_config(argc, argv);
     if (config.help) {
