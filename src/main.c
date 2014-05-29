@@ -66,7 +66,7 @@ const char* USAGE_STRING = ""
 "* o - zoom out\n";
 
 
-World_t world;
+World_t world_g;
 
 void inner_main(void *nop, int argc, char** argv);
 
@@ -89,16 +89,16 @@ void inner_main(void *nop, int argc, char** argv)
         return;
     }
     // Load board and ruleset into 'world'
-    if (world_init(&world, config)) {
+    if (world_init(&world_g, config)) {
         return;
     }
     // Register C primitive functions for Scheme
     scm_with_guile(&register_scm_functions, NULL);
     // Enter main loop
     if (config.graphical) {
-        main_glfw(&world, config.sleep_time * 1000, config.fullscreen);
+        main_glfw(&world_g, config.sleep_time * 1000, config.fullscreen);
     } else {
-        main_curses(&world, config.sleep_time * 1000);
+        main_curses(&world_g, config.sleep_time * 1000);
     }
-    world_destroy(&world);
+    world_destroy(&world_g);
 }

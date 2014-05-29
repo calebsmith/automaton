@@ -1,6 +1,6 @@
 #include "scm.h"
 
-World_t world;
+World_t world_g;
 
 
 SCM scm_von_neumann_neighbors(SCM x_in, SCM y_in, SCM state_in)
@@ -9,7 +9,7 @@ SCM scm_von_neumann_neighbors(SCM x_in, SCM y_in, SCM state_in)
     int y = scm_to_int(y_in);
     unsigned char state = scm_to_uchar(state_in);
     return scm_from_int(
-        board_count_von_neumann_neighbors(world.board, x, y, state));
+        board_count_von_neumann_neighbors(world_g.board, x, y, state));
 }
 
 SCM scm_moore_neighbors(SCM x_in, SCM y_in, SCM state_in)
@@ -18,13 +18,13 @@ SCM scm_moore_neighbors(SCM x_in, SCM y_in, SCM state_in)
     int y = scm_to_int(y_in);
     unsigned char state = scm_to_uchar(state_in);
     return scm_from_int(
-        board_count_moore_neighbors(world.board, x, y, state));
+        board_count_moore_neighbors(world_g.board, x, y, state));
 }
 
 SCM scm_get_cell(SCM x, SCM y)
 {
     return scm_from_uchar(
-        board_get_cell(world.board, scm_to_int(x), scm_to_int(y)));
+        board_get_cell(world_g.board, scm_to_int(x), scm_to_int(y)));
 }
 
 void *register_scm_functions(void* data)
