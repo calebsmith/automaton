@@ -1,8 +1,9 @@
 Change log
 ==========
 
-v0.0.8 (Unreleased)
+v0.0.8 (June 8 2014)
 -------------------
+    * Added documentation for file formats and Scheme API
     * Added support for defining automata rules in Scheme.
     * Uses pkg-config for glfw3 linker flags to make builds on different
         distributions simpler
