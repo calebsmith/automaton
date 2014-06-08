@@ -138,18 +138,5 @@ If the filename cannot be found, the module is not exported or the function
 is not defined, the program will crash and display the error that the was
 reached when attempting to load the Scheme file.
 
+Refer to the [Scheme API Docs](docs/scheme_api.md) for information on the
 Scheme API
-----------
-
-The heart of programming an automata with Scheme is using the provided API.
-gameoflife defines the following native procedures for Scheme code to call
-
-    (board-get-cell x y)
-        Returns the state of the current cell at x, y
-    (board-von-neuman-neighbors x y state)
-        Returns the number of Von Neumann neighbors that have that state
-    (board-moore-neighbors x y state)
-        Returns the number of Moore neighbors that have that state
-
-Refer to scm/gameoflife.scm for an example. This implements Conway's Game
-of Life, which does not need Scheme, but it serves as a simple example.

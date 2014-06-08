@@ -105,6 +105,12 @@ During program execution, the following keys have the corresponding effects:
 * o - zoom out
 
 
+To define your own automata and seeds refer to the docs on file formats and the Scheme API:
+
+[File formats](docs/file_formats.md).
+[Scheme](docs/scheme_api.md).
+
+
 Authors
 -------
 Caleb Smith
