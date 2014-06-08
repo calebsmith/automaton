@@ -3,7 +3,7 @@ gameoflife
 
 A simple cellular automata simulation runner in C
 (such as Conway's Game of Life)
-![gameoflife](http://i.imgur.com/B0ElyTn.png)
+![gameoflife](http://i.imgur.com/LMw8CsK.gif)
 ![briansbraingraphical](http://i.imgur.com/OEZeJu6.png)
 
 Notes
