@@ -138,5 +138,5 @@ If the filename cannot be found, the module is not exported or the function
 is not defined, the program will crash and display the error that the was
 reached when attempting to load the Scheme file.
 
-Refer to the [Scheme API Docs](docs/scheme_api.md) for information on the
+Refer to the [Scheme API Docs](scheme_api.md) for information on the
 Scheme API
