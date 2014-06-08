@@ -26,17 +26,20 @@ Dependencies
  * ncurses 5.9.6
  * opengl
  * glfw 3.0.4
+ * guile 2.0
 
 For Arch these are provided in the following packages:
 
  * glfw
  * ncurses
+ * guile
 
 For Debian GNU/Linux these are provided in the following packages:
 
  * libncurses5-dev
  * libglu1-mesa-dev
- * (must install glfw 3 from source)
+ * guile-2.0-dev
+ * (must compile and install glfw 3 from source)
 
 The base requirements for compiling are:
 
@@ -101,42 +104,6 @@ During program execution, the following keys have the corresponding effects:
 * i - zoom in
 * o - zoom out
 
-
-Seed data files
----------------
-The data files that provide an initial state of the board have the following
-format
-
-    rule_filename
-    width,height
-    state:x,y
-    state:x,y
-    state:x,y
-    ...
-
-The following is an example data file
-
-    life
-    8,8
-    1:4,4
-    1:3,4
-    1:3,3
-
-Would use the rules/life.rule rule file (for Game of Life) and have the general
-starting appearance of:
-
-    00000000
-    00000000
-    00000000
-    00010000
-    00011000
-    00000000
-    00000000
-    00000000
-
-See data/gosper_gun.dat for a more practical example
-
-See data/diode.dat for a barebones example of WireWorld automata
 
 Authors
 -------
