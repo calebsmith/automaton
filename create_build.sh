@@ -17,5 +17,6 @@ echo "Copying shell scripts into" $BUILDDIR
 cp run_*.sh $BUILDDIR
 echo "Compressiong" $BUILDDIR
 tar -cvf gameoflife.tar $BUILDDIR
+gzip gameoflife.tar
 echo "Cleaning up"
 rm -Rf $BUILDDIR

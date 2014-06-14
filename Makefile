@@ -24,5 +24,5 @@ main.o: $(HEADERS) src/text_ui.o src/graphical_ui.o
 clean:
 	rm -f $(NAME)
 	rm -f src/*.o
-	rm gameoflife.tar
+	rm gameoflife.tar.gz
 	rm -Rf game_of_life/
