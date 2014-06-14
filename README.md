@@ -6,6 +6,11 @@ A simple cellular automata simulation runner in C
 ![gameoflife](http://i.imgur.com/LMw8CsK.gif)
 ![briansbraingraphical](http://i.imgur.com/OEZeJu6.png)
 
+Quick Start
+-----------
+For 64-bit Ubuntu Linux, a tarball with precompiled binary and required assets
+is provided for convenience in [gameoflife/releases](https://github.com/calebsmith/gameoflife/releases)
+
 Notes
 -----
 
@@ -18,7 +23,6 @@ yet tested.
 Windows support is non-existent at the moment. If this is desired, please
 contribute by making a pull request or opening an issue with links to good
 documentation.
-
 
 Dependencies
 ------------
