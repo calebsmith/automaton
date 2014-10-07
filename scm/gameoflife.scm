@@ -1,5 +1,5 @@
 (define-module (gameoflife)
-    #:export (get-next-cell))
+    #:export (generate-next))
 
 
 (define (generate-cell current neighbors)
@@ -13,8 +13,14 @@
 
 
 (define (cell-based-generator x y state-num neighbor-func rule-func)
-    (rule-func (board-get-cell x y) (neighbor-func x y state-num)))
+    (board-set-cell x y (rule-func
+        (board-get-cell x y)
+        (neighbor-func x y state-num))))
 
 
-(define (get-next-cell x y)
-    (cell-based-generator x y 1 board-moore-neighbors generate-cell))
+(define (generate-next)
+    (map (lambda (y)
+        (map (lambda (x)
+            (cell-based-generator x y 1 board-moore-neighbors generate-cell))
+            (iota (board-get-width))))
+        (iota (board-get-height))))

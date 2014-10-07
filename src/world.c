@@ -80,6 +80,9 @@ int world_init(World_t* world, Config_t config)
         board_init(world->board, infile, config.toroidal);
         fclose(infile);
     }
+    world->next_board->cells = (unsigned char*) calloc(
+        world->board->width * world->board->height, sizeof(unsigned char)
+    );
     board_copy(world->next_board, world->board);
     // Load rule file
     if ((infile = fopen(world->board->rule_filename, "r")) == NULL) {

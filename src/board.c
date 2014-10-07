@@ -103,7 +103,6 @@ void board_copy(Board_t* board_a, const Board_t* board_b)
     board_a->width = board_b->width;
     board_a->height = board_b->height;
     size = board_a->width * board_a->height;
-    board_a->cells = malloc(size * sizeof(unsigned char));
     for(i = 0; i < size; i++) {
         board_a->cells[i] = board_b->cells[i];
     }
@@ -124,6 +123,12 @@ void board_swap(Board_t* board_a, Board_t* board_b)
     board_b->cells = swap_cells;
 }
 
+
+int board_get_toroidal(const Board_t* board)
+{
+    return board->toroidal;
+}
+
 /*
  * Given a Board_t* and x,y coordinates, returns the value of the cell at that
  * location. If the board is toroidal and x,y is out of bounds, the coordinates
@@ -134,23 +139,13 @@ void board_swap(Board_t* board_a, Board_t* board_b)
  * Side-Effects: None
  * Returns: int value of the cell (0 or 1)
  */
-int board_get_cell(const Board_t* board, int x, int y)
+unsigned char board_get_cell(const Board_t* board, int x, int y)
 {
     int index;
 
     if (board->toroidal) {
-        if (x >= board->width) {
-            x -= board->width;
-        }
-        if (x < 0) {
-            x += board->width;
-        }
-        if (y >= board->height) {
-            y -= board->height;
-        }
-        if (y < 0) {
-            y += board->height;
-        }
+        x %= board->width;
+        y %= board->height;
     } else if (x >= board->width || x < 0 || y >= board->height || y < 0) {
         return 0;
     }
@@ -158,9 +153,14 @@ int board_get_cell(const Board_t* board, int x, int y)
     return board->cells[index];
 }
 
-void board_set_cell(const Board_t* board, int x, int y, unsigned char state)
+void board_set_cell(Board_t* board, int x, int y, unsigned char state)
 {
-    board->cells[y * board->width + x] = state;
+    int index = y * board->width + x;
+    int size = board->width * board->height;
+
+    if (index >= 0 && index < size) {
+        board->cells[index] = state;
+    }
 }
 /*
  * Given a Board_t pointer and x,y coordinates, returns the number

@@ -44,8 +44,9 @@ typedef struct {
 void board_init(Board_t* board, FILE* infile, int toroidal);
 void board_copy(Board_t* board_a, const Board_t* board_b);
 void board_swap(Board_t* board_a, Board_t* board_b);
-int board_get_cell(const Board_t* board, int x, int y);
-void board_set_cell(const Board_t* board, int x, int y, unsigned char state);
+int board_get_toroidal(const Board_t* board);
+unsigned char board_get_cell(const Board_t* board, int x, int y);
+void board_set_cell(Board_t* board, int x, int y, unsigned char state);
 int board_count_moore_neighbors(const Board_t* board, int x, int y, unsigned char state);
 int board_count_von_neumann_neighbors(const Board_t* board, int x, int y, unsigned char state);
 void board_destroy(Board_t* board);
