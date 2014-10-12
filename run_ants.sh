@@ -1,1 +1,1 @@
-./gameoflife -t data/ants.dat -g -s 1
+./gameoflife -t data/ants.dat -g -s 6000

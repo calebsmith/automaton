@@ -8,9 +8,12 @@
 
 (define mod-4 (lambda (n) (modulo n 4)))
 
+(define flip-value (compose (lambda (n) (modulo n 2)) 1+))
+
 (define turn-right (compose mod-4 1+))
 
 (define turn-left (compose mod-4 1-))
+
 
 (define (ant-turn direction)
     (let ((turn-func
@@ -19,11 +22,12 @@
                 turn-left)))
         (set! ant-state (turn-func ant-state))))
 
-(define (ant-inbounds)
-    (and (>= ant-x 0) (>= ant-y 0)
-         (< ant-x (board-get-width)) (< ant-y (board-get-height))))
 
-(define (ant-move)
+(define (ant-flip-tile current-tile)
+  (board-set-cell ant-x ant-y (flip-value current-tile)))
+
+
+(define (ant-walk)
     (case ant-state
         ((0) (set! ant-y (1- ant-y)))
         ((1) (set! ant-x (1+ ant-x)))
@@ -35,19 +39,22 @@
             (set! ant-y (modulo ant-y (board-get-height))))))
 
 
-(define (ant-decide)
-    (if (eq? (board-get-cell ant-x ant-y) 0)
-        (begin
+(define (ant-inbounds)
+    (and (>= ant-x 0) (>= ant-y 0)
+         (< ant-x (board-get-width)) (< ant-y (board-get-height))))
+
+
+(define (ant-go)
+    (let ((current (board-get-cell ant-x ant-y)))
+        (if (eq? current 0)
             (ant-turn 'right)
-            (board-set-cell ant-x ant-y 1))
-        (begin
-            (ant-turn 'left)
-            (board-set-cell ant-x ant-y 0))))
+            (ant-turn 'left))
+        (ant-flip-tile current))
+        (ant-walk))
 
 
 (define (generate-next)
     (if (ant-inbounds)
         (begin
-            (ant-decide)
-            (ant-move)
+            (ant-go)
             (board-done!))))
