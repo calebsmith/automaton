@@ -51,9 +51,17 @@ The base requirements for compiling are:
  * make 3.8.1
  * gcc 4.6.3
 
+Redistribution
+--------------
+
+A `create_build.sh` shell script is available for making redistribution of the
+program simpler. It is used to create the tarballs provided on the GitHub
+releases page. This script builds the program with static links to reduce
+dependencies for target users' machines.
+
 In order to static link against guile, set GUILE_LIB_FLAGS to --static when
-running make. This is only necessary when building for redistribution, as the
-create_build.sh shell script does. This requires libunistring-dev.
+running make. This is how the `create_build.sh` shell script calls make. This
+requires libunistring-dev.
 
 Installation
 ------------
