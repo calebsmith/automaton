@@ -1,4 +1,3 @@
 *.o
-gameoflife
-tags
-gameoflife.tar.gz
+automaton
+automaton.tar.gz

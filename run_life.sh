@@ -1,1 +1,1 @@
-./gameoflife -t data/gosper_gun.dat
+./automaton -t data/gosper_gun.dat

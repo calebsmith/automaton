@@ -1,1 +1,1 @@
-./gameoflife -t data/r_pentomino.dat -g
+./automaton -t data/r_pentomino.dat -g

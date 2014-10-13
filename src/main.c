@@ -1,5 +1,5 @@
 /*
-A straightforward implementation of Conway's Game of Life in C
+A cellular automata runner in C, with extensibility in Scheme
 Copyright (C) 2013  Caleb Smith
 
 This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 const char* USAGE_STRING = ""
 "The command format is:\n"
 "\n"
-"gameoflife [Options] seed_filename\n"
+"automaton [Options] seed_filename\n"
 "\n"
 "Command line flags include:\n"
 "\n"
@@ -45,9 +45,9 @@ const char* USAGE_STRING = ""
 "Examples\n"
 "\n"
 "    #Fast, full-screen graphical display\n"
-"    ./gameoflife -g -f -s 1000 data/gosper_gun.dat\n"
+"    ./automaton -g -f -s 1000 data/gosper_gun.dat\n"
 "    #Slow, toroidal textual display\n"
-"    ./gameoflife -s 500000 data/r_pentomino.dat\n"
+"    ./automaton -s 500000 data/r_pentomino.dat\n"
 "\n"
 "\n"
 "Usage During Runtime\n"

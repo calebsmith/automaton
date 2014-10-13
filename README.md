@@ -1,24 +1,26 @@
-gameoflife
+automaton
 ==========
 
 A simple cellular automata simulation runner in C
 (such as Conway's Game of Life)
-![gameoflife](http://i.imgur.com/LMw8CsK.gif)
+![automaton](http://i.imgur.com/LMw8CsK.gif)
 ![briansbraingraphical](http://i.imgur.com/OEZeJu6.png)
 
 Quick Start
 -----------
 For 64-bit Ubuntu Linux, a tarball with precompiled binary and required assets
-is provided for convenience in [gameoflife/releases](https://github.com/calebsmith/gameoflife/releases)
+is provided for convenience in [automaton/releases](https://github.com/calebsmith/automaton/releases)
 
 Notes
 -----
 
-This project is experimental and exists for my own learning.
+This project is largely experimental and exists for my own learning, but has
+recently become pretty stable nonetheless.
 
-This was developed and tested on GNU/Linux. The curses and time libraries rely
-on POSIX standards and will likely compile and run on Mac OSX, but this is not
-yet tested.
+This was developed and tested on Ubuntu and Arch GNU/Linux. The curses and time
+libraries rely on POSIX standards and will likely compile and run on Mac OSX
+with some work, but this is not yet tested at all. (It is my suspicion that the
+largest hurdles will be compiling the GLFW3 and Guile 2.0 dependencies).
 
 Windows support is non-existent at the moment. If this is desired, please
 contribute by making a pull request or opening an issue with links to good
@@ -38,7 +40,7 @@ For Arch these are provided in the following packages:
  * ncurses
  * guile
 
-For Debian GNU/Linux these are provided in the following packages:
+For Debian/Ubuntu GNU/Linux these are provided in the following packages:
 
  * libncurses5-dev
  * libglu1-mesa-dev
@@ -56,20 +58,31 @@ Redistribution
 
 A `create_build.sh` shell script is available for making redistribution of the
 program simpler. It is used to create the tarballs provided on the GitHub
-releases page. This script builds the program with static links to reduce
-dependencies for target users' machines.
+releases page.
 
-In order to static link against guile, set GUILE_LIB_FLAGS to --static when
-running make. This is how the `create_build.sh` shell script calls make. This
-requires libunistring-dev.
+Currently, precompiled releases are provided for 64-bit Ubuntu only. Any help
+with packaging on other distros is greatly appreciated.
+
+At the moment, the release builds are not static linked. Any help in this
+regard would be greatly appreciated.
+
 
 Installation
 ------------
-First, assure all requirements are met.
-To run, clone the repo, run make in the src folder, then run 'run_life.sh'
+If you are on 64-bit Ubuntu, download a release from
+[automaton/releases](https://github.com/calebsmith/automaton/releases)
+You will likely need libguile-2.0, libncurses5 and libglu1-mesa-dev for
+dynamic linking to work.
 
-    git clone git@github.com:calebsmith/gameoflife.git
-    cd gameoflife/src
+Otherwise, you'll need to build from source, at least for the moment. First,
+ensure all requirements are met.
+
+To build, clone the repo, run make in the src folder, then run any of the
+shell scripts beginning with 'run', such as 'run_life.sh' to test it::
+
+
+    git clone git@github.com:calebsmith/automaton.git
+    cd automaton/src
     make
     cd ..
     source run_life.sh
@@ -81,11 +94,11 @@ Usage
 The program requires one argument, which is the data file for loading the
 initial state (e.g. seed). Such files are provided with the repository in
 the /data folder. The run_life.sh shell command demonstrates running
-gameoflife with the gosper_gun data file.
+automaton with the gosper_gun data file.
 
 The command format is:
 
-gameoflife [Options] seed_filename
+automaton [Options] seed_filename
 
 Command line flags include:
 
@@ -99,9 +112,9 @@ Command line flags include:
 Examples
 
     #Fast, full-screen graphical display
-    ./gameoflife -g -f -s 1000 data/gosper_gun.dat
+    ./automaton -g -f -s 1000 data/gosper_gun.dat
     #Slow, toroidal textual display
-    ./gameoflife -s 500000 data/r_pentomino.dat
+    ./automaton -s 500000 data/r_pentomino.dat
 
 
 Usage During Runtime

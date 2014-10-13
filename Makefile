@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -std=gnu99 `guile-config compile` -D _BSD_SOURCE -O3 `pkg-config --cflags glfw3`
 LIBS = -lrt `pkg-config --libs $$GUILE_LIB_FLAGS guile-2.0` -lncurses `pkg-config --libs --static glfw3`
-NAME = gameoflife
+NAME = automaton
 HEADERS = src/board.h src/lens.h src/rule.h src/world.h src/backend.h src/text_ui.h src/graphical_ui.h src/scm.h
 SOURCES = src/main.c $(HEADERS:.h=.c)
 OBJECTS = $(SOURCES:.c=.o)
@@ -24,5 +24,5 @@ main.o: $(HEADERS) src/text_ui.o src/graphical_ui.o
 clean:
 	rm -f $(NAME)
 	rm -f src/*.o
-	rm gameoflife.tar.gz
+	rm automaton.tar.gz
 	rm -Rf game_of_life/

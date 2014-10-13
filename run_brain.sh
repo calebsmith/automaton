@@ -1,1 +1,1 @@
-./gameoflife -g -t data/brain_chaos.dat
+./automaton -g -t data/brain_chaos.dat

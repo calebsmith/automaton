@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-BUILDDIR="game_of_life"
+BUILDDIR="automaton_build"
 mkdir $BUILDDIR
 echo "Compiling ..."
 GUILE_LIB_FLAGS='--static' make -B
@@ -12,11 +12,11 @@ cp -r rules $BUILDDIR
 cp -r data $BUILDDIR
 cp -r scm $BUILDDIR
 echo "Copying executables into" $BUILDDIR
-cp gameoflife $BUILDDIR
+cp automaton $BUILDDIR
 echo "Copying shell scripts into" $BUILDDIR
 cp run_*.sh $BUILDDIR
 echo "Compressiong" $BUILDDIR
-tar -cvf gameoflife.tar $BUILDDIR
-gzip gameoflife.tar
+tar -cvf automaton.tar $BUILDDIR
+gzip automaton.tar
 echo "Cleaning up"
 rm -Rf $BUILDDIR

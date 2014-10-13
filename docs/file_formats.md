@@ -1,14 +1,14 @@
-File formats for gameoflife
+File formats for automaton
 ===========================
 
-There are two types of data files for working with gameoflife. These are the
+There are two types of data files for working with automaton. These are the
 "seed" data files and the "rule" files. The seed data files determine the
 beginning state (or seed) a particular execution of the simulation should have.
 These also define a width, height, and a rule file that should be used. The
 rule files define what states an automata can have, how to display them, and
 the set of rules governing their transitions from one state to another.
 
-A third type of file for working with gameoflife is a Scheme script. This acts
+A third type of file for working with automaton is a Scheme script. This acts
 in much the same way as the transition rules of a rule file, but allow for
 extensibility outside of the confines of a "pure" automata. In other words, a
 cell's next state can be programmed in any way the author thinks is suitable
@@ -114,7 +114,7 @@ Scheme definition line is:
     scm/gameoflife.scm:gameoflife:generate-next
 
 This will load the gameoflife.scm Scheme file in the scm folder (relative to
-the gameoflife executable in the root project directory). The module will need
+the automaton executable in the root project directory). The module will need
 to export a module named "gameoflife" which defines a function named
 "get-next-cell".
 
