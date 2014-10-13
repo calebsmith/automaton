@@ -51,6 +51,9 @@ The base requirements for compiling are:
  * make 3.8.1
  * gcc 4.6.3
 
+In order to static link against guile, set GUILE_LIB_FLAGS to --static when
+running make. This is only necessary when building for redistribution, as the
+create_build.sh shell script does. This requires libunistring-dev.
 
 Installation
 ------------
