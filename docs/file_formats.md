@@ -111,7 +111,7 @@ To demonstrate an automata that uses Scheme, the rules/life_scm.rule file
 implements the same behavior in Scheme, and has no transitions defined. Its
 Scheme definition line is:
 
-    scm/gameoflife.scm:gameoflife:get-next-cell
+    scm/gameoflife.scm:gameoflife:generate-next
 
 This will load the gameoflife.scm Scheme file in the scm folder (relative to
 the gameoflife executable in the root project directory). The module will need
@@ -127,16 +127,11 @@ Scheme files
 
 Scheme files are defined in /scm. To use a Scheme file, define the filename
 to be loaded, the module it exports, and the function to be called for each
-cell as described in the Scheme example of the rule file documentation.
-
-This function will be called with the x,y coordinates of the each cell in turn
-and must return the value of the next state of the cell. Once returned, no
-check or coercion is made to the state that the Scheme procedure returns, so
-take care to ensure it is valid.
+generation as described in the Scheme example of the rule file documentation.
 
 If the filename cannot be found, the module is not exported or the function
-is not defined, the program will crash and display the error that the was
+is not defined, the program will crash and display the error that was
 reached when attempting to load the Scheme file.
 
-Refer to the [Scheme API Docs](scheme_api.md) for information on the
-Scheme API
+Several C procedures are provided to the Scheme module. Refer to the
+[Scheme API Docs](scheme_api.md) for information on the Scheme API
