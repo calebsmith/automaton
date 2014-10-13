@@ -1,6 +1,16 @@
 Change log
 ==========
 
+v0.0.9 (Oct 12 2014)
+-------------------
+    * Changed C/Scheme layer to call Scheme once per generation, not per cell.
+        This makes the given module "impure" (it sets values on the board
+        directly) but allows for more flexibility in what a given module can
+        implement.
+    * Added an implementation of Langton's Ant in Scheme.
+    * Changed project name to "automaton" from "gameoflife" since GOL is one
+        of several automata in the project.
+
 v0.0.8 (June 8 2014)
 -------------------
     * Added documentation for file formats and Scheme API
