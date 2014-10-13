@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -std=gnu99 `guile-config compile` -D _BSD_SOURCE -O3 `pkg-config --cflags glfw3`
-LIBS = -lrt `guile-config link` -lncurses `pkg-config --libs --static glfw3`
+LIBS = -lrt `pkg-config --libs $$GUILE_LIB_FLAGS guile-2.0` -lncurses `pkg-config --libs --static glfw3`
 NAME = gameoflife
 HEADERS = src/board.h src/lens.h src/rule.h src/world.h src/backend.h src/text_ui.h src/graphical_ui.h src/scm.h
 SOURCES = src/main.c $(HEADERS:.h=.c)

@@ -2,7 +2,7 @@
 BUILDDIR="game_of_life"
 mkdir $BUILDDIR
 echo "Compiling ..."
-make
+GUILE_LIB_FLAGS='--static' make -B
 echo "Copying docs into" $BUILDDIR
 cp LICENSE $BUILDDIR
 cp README.md $BUILDDIR
