@@ -11,7 +11,7 @@
  *     clock after the CPU sleep has occured. This is used to calculate the
  *     amount of time to sleep in the next loop execution.
 */
-void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
+void wait_until(unsigned long long int sleep_time, unsigned long long int* last_time)
 {
     unsigned long long now, delta;
     struct timespec tm, sleep_tm;

@@ -49,7 +49,7 @@ int main_glfw(World_t* world, unsigned long long int sleep_time, bool fullscreen
             render(world, &lens);
             if (playing) {
                 generate(world);
-                wait(sleep_time, &last_time);
+                wait_until(sleep_time, &last_time);
             }
         }
     } else {

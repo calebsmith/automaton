@@ -62,7 +62,7 @@ void main_curses(World_t* world, unsigned long long int sleep_time) {
         if (playing) {
             display_curses(world, &lens, window);
             generate(world);
-            wait(sleep_time, &last_time);
+            wait_until(sleep_time, &last_time);
         }
     }
 
