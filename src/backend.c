@@ -1,7 +1,6 @@
 #include "backend.h"
 
-/* Workaround for Mac's missing implementation of clock_gettime (uses
- * clock_get_time instead
+/* Workaround for Mac's missing implementation of clock_gettime
 */
 #ifdef __MACH__
 int clock_gettime(int clk_id, struct timespec* t) {
