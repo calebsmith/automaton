@@ -7,6 +7,13 @@
 #define BACKEND_H
 
 #include <time.h>
+// clock_gettime is not implemented in OS X. Here is a workaround.
+// See backend.c for the implementation
+#ifdef __MACH__
+#include <sys/time.h>
+extern int clock_gettime(int clk_id, struct timespec* t);
+#define CLOCK_REALTIME 0
+#endif
 
 #include "world.h"
 #include "scm.h"
@@ -17,6 +24,6 @@
 
 void generate(World_t* world);
 void handle_transition_rule(World_t* world, int x, int y);
-void wait(unsigned long long int sleep_time, unsigned long long int* last_time);
+void wait_until(unsigned long long int sleep_time, unsigned long long int* last_time);
 
 #endif

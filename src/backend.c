@@ -1,5 +1,18 @@
 #include "backend.h"
 
+/* Workaround for Mac's missing implementation of clock_gettime
+*/
+#ifdef __MACH__
+int clock_gettime(int clk_id, struct timespec* t) {
+     struct timeval now;
+     int rv = gettimeofday(&now, NULL);
+     if (rv) return rv;
+     t->tv_sec  = now.tv_sec;
+     t->tv_nsec = now.tv_usec * 1000;
+     return 0;
+}
+#endif
+
 /*
  * Wait for <sleep_time> adjusted by the difference of the current
  * time and the finishing time of the last loop execution.
@@ -11,7 +24,7 @@
  *     clock after the CPU sleep has occured. This is used to calculate the
  *     amount of time to sleep in the next loop execution.
 */
-void wait(unsigned long long int sleep_time, unsigned long long int* last_time)
+void wait_until(unsigned long long int sleep_time, unsigned long long int* last_time)
 {
     unsigned long long now, delta;
     struct timespec tm, sleep_tm;

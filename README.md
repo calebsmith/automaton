@@ -47,6 +47,8 @@ For Debian/Ubuntu GNU/Linux these are provided in the following packages:
  * guile-2.0-dev
  * (must compile and install glfw 3 from source)
 
+For Mac OS X, please see the section on [Installation for OS X](#install-osx)
+
 The base requirements for compiling are:
 
  * git 1.7.9
@@ -69,6 +71,9 @@ regard would be greatly appreciated.
 
 Installation
 ------------
+
+If you are installing on Mac OS X, skip to [Installation for OS X](#install-osx).
+
 If you are on 64-bit Ubuntu, download a release from
 [automaton/releases](https://github.com/calebsmith/automaton/releases)
 You will likely need libguile-2.0, libncurses5 and libglu1-mesa-dev for
@@ -87,8 +92,118 @@ shell scripts beginning with 'run', such as 'run_life.sh' to test it::
     cd ..
     source run_life.sh
 
+Skip to [Usage](#usage) to start running this project.
 
-Usage
+
+<a name="install-osx"><a/>Installation for OS X
+---------------------
+
+This installation assumes that you are using homebrew and are using OS X
+Yosemite. If you are using a different version or if you compile your tools
+from scratch, or if you use another package manager such as MacPorts or pkgsrc,
+the steps may be slightly different.
+
+###Dependencies:
+
+ * xcode
+ * xcode command line tools
+ * homebrew
+
+Install the following via homebrew using 'brew install':
+
+ * autoconf
+ * automake
+ * libtool
+ * pkg-config
+ * bdw-gc
+
+Check the version of bdw-gc:
+
+    brew info bdw-gc
+
+If it says 7.5.0 or later, skip to [basic installation](#basic-osx-install). If
+not, you most likely have a bug with xcode and cmake that will throw an
+`unknown attribute __alloc_size__` error when you try to compile later. Follow
+the workaround for homebrew and bdw-gc below.
+
+###Workaround for Homebrew and bdw-gc:
+
+The bdw-gc brew does not have a HEAD defined, so we have to install from source
+and trick homebrew into thinking that it is using a brew.
+
+> NOTE: This is using a non-stable, non-release commit for bdw-gc, and may
+> contain bugs. The commit hashes used are the ones that worked during testing.
+> Other hashes may work, but have not been tested.
+
+Uninstall bdw-gc so it doesn't interfere with the source install. It will be
+reinstalled again after the source install.
+
+    brew uninstall bdw-gc
+
+Choose a directory for downloading the bdw-gc source code and `cd` to it.
+
+    git clone git://github.com/ivmai/bdwgc
+    git checkout 0322b83386
+    git clone git://github.com/ivmai/libatomic_ops
+    cd libatomic_ops
+    git checkout d200fdcc6e
+    cd ..
+    autoreconf -vif
+    ./configure
+    make && make install
+
+Now reinstall bdw-gc. Ignore any messages about 'brew link' not completing
+successfully.
+
+    brew install bdw-gc
+
+Finally, make brew used the compiled source:
+
+    cd /usr/local/Cellar/bdw-gc/7.4.2/include
+    rm -rf gc*
+    cp -r /usr/local/include/gc* .
+    cd ../share
+    rm -rf gc
+    cp -r /usr/local/include/gc .
+    cd ../lib
+    rm -f lib*
+    find /usr/local/lib/libcord* -type f -exec cp -vp {} . \;
+    find /usr/local/lib/libgc* -type f -exec cp -vp {} . \;
+    ln -s libcord.1.dylib libcord.dylib
+    ln -s libgc.1.dylib libgc.dylib
+    brew link --overwrite bdw-gc
+
+###<a name="basic-osx-install"></a>Basic Installation:
+
+Install glfw:
+
+    brew tap homebrew/versions
+    brew install glfw3
+
+Install guile:
+
+    brew install guile
+
+Choose a download directory for automaton and `cd` to it:
+
+    git clone git@github.com:calebsmith/automaton.git
+    cd automaton
+
+Edit the Makefile to remove librt from LIBS. Your LIBS line should look like:
+
+    LIBS = `pkg-config --libs $$GUILE_LIB_FLAGS guile-2.0` -lncurses `pkg-config --libs --static glfw3`
+
+Now build, and you're ready to run automaton.
+
+    make
+
+> The terminal version exhibits some strange behavior on Mac, so automaton
+> seems to run best with the -g (graphical) flag. The graphical version does
+> take a lot of processing power and may freeze temporarily on Yosemite Macs
+> with less than 8 GB of RAM.
+
+
+<a name="usage"></a>Usage
 -----
 
 The program requires one argument, which is the data file for loading the
